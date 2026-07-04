@@ -1,0 +1,348 @@
+/* ============================================================
+   Ruta del Sabor - estilos propios
+   Tailwind CSS (CDN) da las utilidades; aquí solo va lo que
+   Tailwind no resuelve por clases: el ajuste de Material Symbols,
+   el gráfico de barras por horas y las alertas, hechos solo con
+   HTML + CSS (sin librerías de gráficos).
+   ============================================================ */
+
+.material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+.text-muted {
+    color: #78716C;
+}
+
+/* ------------------------------------------------------------
+   Sidebar: enlaces de navegación entre módulos
+   ------------------------------------------------------------ */
+
+.sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.62rem 0.75rem;
+    border-radius: 0.7rem;
+    font-size: 0.875rem;
+    line-height: 1.2;
+    transition: background-color .18s ease, color .18s ease, transform .18s ease;
+}
+
+/* Módulo activo: fondo cálido, borde redondeado y buen contraste de texto */
+.sidebar-link--active {
+    background-color: #FFEDD5;
+    color: #9A3412;
+    font-weight: 600;
+    box-shadow: inset 0 0 0 1px rgba(234, 88, 12, .18);
+}
+
+/* Módulos disponibles pero no activos: hover suave */
+.sidebar-link--idle {
+    color: #57534E;
+    text-decoration: none;
+}
+
+.sidebar-link--idle:hover {
+    background-color: #FFF7ED;
+    color: #C2410C;
+    transform: translateX(2px);
+}
+
+/* Módulos todavía no disponibles: claramente diferenciados, sin interacción */
+.sidebar-link--disabled {
+    color: #D6D3D1;
+    background-color: transparent;
+    cursor: not-allowed;
+}
+
+.sidebar-badge-soon {
+    margin-left: auto;
+    font-size: 0.62rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    background-color: #F5F5F4;
+    color: #A8A29E;
+    padding: 0.2rem 0.55rem;
+    border-radius: 999px;
+}
+
+/* ------------------------------------------------------------
+   Formularios (Predicciones, Dataset, Modelo Predictivo)
+   ------------------------------------------------------------ */
+
+.field-label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: #57534E;
+    margin-bottom: 0.35rem;
+}
+
+.field-input {
+    width: 100%;
+    border: 1px solid #E7E5E4;
+    border-radius: 0.6rem;
+    padding: 0.55rem 0.75rem;
+    font-size: 0.875rem;
+    color: #431407;
+    background-color: #ffffff;
+    transition: border-color .15s ease, box-shadow .15s ease;
+}
+
+.field-input:focus {
+    outline: none;
+    border-color: #EA580C;
+    box-shadow: 0 0 0 3px rgba(234, 88, 12, .15);
+}
+
+/* ------------------------------------------------------------
+   Tablas modernas (Dataset Histórico)
+   ------------------------------------------------------------ */
+
+.table-pill {
+    display: inline-block;
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 0.15rem 0.55rem;
+    border-radius: 999px;
+}
+
+.table-pill--yes {
+    background-color: #DCFCE7;
+    color: #15803D;
+}
+
+.table-pill--no {
+    background-color: #F5F5F4;
+    color: #A8A29E;
+}
+
+/* ------------------------------------------------------------
+   Modelo Predictivo: variables y placeholders de gráficos
+   ------------------------------------------------------------ */
+
+.variable-chip {
+    display: inline-block;
+    background-color: #FFF7ED;
+    color: #57534E;
+    border: 1px solid #F5E9DC;
+    font-size: 0.78rem;
+    font-weight: 500;
+    padding: 0.4rem 0.85rem;
+    border-radius: 999px;
+}
+
+.chart-placeholder {
+    height: 220px;
+    border: 2px dashed #FDBA74;
+    border-radius: 1rem;
+    background-color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    color: #9A3412;
+    font-size: 0.85rem;
+}
+
+/* ------------------------------------------------------------
+   Predicción de demanda por horas (barras hechas con CSS)
+   ------------------------------------------------------------ */
+
+.hour-chart__bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 0.75rem;
+    height: 220px;
+    padding-top: 1.75rem;
+}
+
+.hour-bar {
+    flex: 1 1 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    height: 100%;
+}
+
+.hour-bar__fill {
+    width: 100%;
+    max-width: 34px;
+    margin: 0 auto;
+    background: linear-gradient(180deg, #FDBA74, #EA580C);
+    border-radius: 0.5rem 0.5rem 0.25rem 0.25rem;
+    position: relative;
+    transition: height .3s ease;
+}
+
+.hour-bar__value {
+    position: absolute;
+    top: -1.4rem;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #431407;
+}
+
+.hour-bar__label {
+    margin-top: 0.5rem;
+    font-size: 0.75rem;
+    color: #78716C;
+}
+
+/* Horas críticas (mayor acumulación de pedidos) */
+.hour-bar--critica .hour-bar__fill {
+    background: linear-gradient(180deg, #FCA5A5, #DC2626);
+}
+
+.hour-bar--critica .hour-bar__label {
+    color: #B91C1C;
+    font-weight: 600;
+}
+
+.legend-dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.legend-dot--normal { background-color: #EA580C; }
+.legend-dot--critica { background-color: #DC2626; }
+
+/* ------------------------------------------------------------
+   Productos con mayor demanda (lista con barra de progreso)
+   ------------------------------------------------------------ */
+
+.product-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #f1efed;
+}
+
+.product-row:last-child {
+    border-bottom: none;
+}
+
+.product-row__info {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    width: 190px;
+    flex-shrink: 0;
+}
+
+.product-row__icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background-color: #FFF1E6;
+    color: #C2410C;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.product-row__name {
+    font-size: 0.9rem;
+    color: #431407;
+    font-weight: 500;
+}
+
+.product-row__bar {
+    flex: 1 1 auto;
+    height: 8px;
+    background-color: #f1efed;
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.product-row__bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #EA580C, #C2410C);
+    border-radius: 999px;
+}
+
+.product-row__value {
+    width: 70px;
+    text-align: right;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #431407;
+    flex-shrink: 0;
+}
+
+@media (max-width: 575.98px) {
+    .product-row { flex-wrap: wrap; }
+    .product-row__info { width: 100%; }
+    .product-row__bar { order: 3; width: 100%; }
+    .product-row__value { order: 2; margin-left: auto; }
+}
+
+/* ------------------------------------------------------------
+   Alertas operativas
+   ------------------------------------------------------------ */
+
+.alert-item {
+    display: flex;
+    gap: 0.65rem;
+    align-items: flex-start;
+    padding: 0.7rem 0.85rem;
+    border-radius: 0.75rem;
+    margin-bottom: 0.6rem;
+    font-size: 0.85rem;
+}
+
+.alert-item:last-child {
+    margin-bottom: 0;
+}
+
+.alert-item__desc {
+    color: #431407;
+}
+
+.alert-item--danger { background-color: #FEE2E2; }
+.alert-item--danger .material-symbols-outlined { color: #DC2626; }
+
+.alert-item--warning { background-color: #FEF3C7; }
+.alert-item--warning .material-symbols-outlined { color: #D97706; }
+
+.alert-item--info { background-color: #FFEDD5; }
+.alert-item--info .material-symbols-outlined { color: #EA580C; }
+
+/* ------------------------------------------------------------
+   Recomendaciones para cocina
+   ------------------------------------------------------------ */
+
+.recommend-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.recommend-list li {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid #f1efed;
+    font-size: 0.88rem;
+    color: #431407;
+}
+
+.recommend-list li:last-child {
+    border-bottom: none;
+}
+
+.recommend-list .material-symbols-outlined {
+    color: #16A34A;
+}

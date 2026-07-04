@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block title %}Inicio - Ruta del Sabor{% endblock %}
+{% block page_title %}Inicio{% endblock %}
+
+{% block content %}
+
+    <!-- Hero de bienvenida -->
+    <div class="bg-white rounded-2xl shadow-sm p-6 md:p-12 flex flex-col md:flex-row items-center gap-8">
+        <div class="flex-1 flex flex-col gap-4 text-center md:text-left">
+            <h1 class="text-3xl md:text-4xl font-bold text-text-dark leading-tight">
+                Bienvenido a <span class="text-primary">Ruta del Sabor</span>
+            </h1>
+            <p class="text-muted text-base max-w-xl">
+                Sistema inteligente de planificación y predicción de demanda gastronómica.
+                Anticipe los pedidos, coordine su cocina y organice el delivery con datos claros y visuales.
+            </p>
+            <div class="flex flex-wrap gap-3 justify-center md:justify-start mt-2">
+                <a href="{% url 'dashboard:index' %}"
+                   class="inline-flex items-center gap-2 bg-primary hover:bg-primary-dark text-white text-sm font-medium px-5 py-2.5 rounded-full transition-colors duration-200 shadow-sm">
+                    <span class="material-symbols-outlined text-[18px]">dashboard</span>
+                    Ir al Panel de Control
+                </a>
+                <a href="{% url 'predicciones:index' %}"
+                   class="inline-flex items-center gap-2 bg-orange-50 hover:bg-orange-100 text-primary-dark text-sm font-medium px-5 py-2.5 rounded-full transition-colors duration-200 border border-orange-100">
+                    <span class="material-symbols-outlined text-[18px]">online_prediction</span>
+                    Ver Predicciones
+                </a>
+            </div>
+        </div>
+
+        <!-- Bloque visual tipo hero, hecho solo con CSS (sin imágenes externas) -->
+        <div class="w-full md:w-5/12 h-64 rounded-2xl bg-gradient-to-br from-orange-50 to-orange-100/60 border border-orange-100 flex flex-col items-center justify-center gap-3 relative overflow-hidden">
+            <div class="absolute -right-10 -top-10 w-40 h-40 bg-primary/10 rounded-full blur-2xl"></div>
+            <div class="absolute -left-8 -bottom-8 w-32 h-32 bg-primary-dark/10 rounded-full blur-2xl"></div>
+            <span class="w-16 h-16 rounded-full bg-primary text-white flex items-center justify-center relative z-10">
+                <span class="material-symbols-outlined text-[32px]">restaurant_menu</span>
+            </span>
+            <span class="text-sm font-semibold text-primary-dark relative z-10">Predicción de demanda en tiempo real</span>
+            <div class="flex gap-4 relative z-10 mt-1">
+                <div class="text-center">
+                    <span class="block text-lg font-bold text-text-dark">185</span>
+                    <span class="block text-[11px] text-muted">pedidos hoy</span>
+                </div>
+                <div class="text-center">
+                    <span class="block text-lg font-bold text-text-dark">19-21h</span>
+                    <span class="block text-[11px] text-muted">hora pico</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Capacidades estratégicas -->
+    <div class="mt-10">
+        <h2 class="font-semibold text-text-dark mb-4">Capacidades Estratégicas</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="bg-white rounded-2xl shadow-sm p-5 hover:shadow-md hover:-translate-y-0.5 transition-all">
+                <span class="w-12 h-12 rounded-xl bg-orange-50 text-primary flex items-center justify-center mb-3">
+                    <span class="material-symbols-outlined text-[22px]">trending_up</span>
+                </span>
+                <h3 class="font-semibold text-text-dark mb-1">Anticipación de Pedidos</h3>
+                <p class="text-sm text-muted">
+                    Proyecte la demanda por hora y prepare su cocina antes de los picos de pedidos.
+                </p>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-sm p-5 hover:shadow-md hover:-translate-y-0.5 transition-all">
+                <span class="w-12 h-12 rounded-xl bg-orange-50 text-primary flex items-center justify-center mb-3">
+                    <span class="material-symbols-outlined text-[22px]">inventory_2</span>
+                </span>
+                <h3 class="font-semibold text-text-dark mb-1">Optimización de Insumos</h3>
+                <p class="text-sm text-muted">
+                    Reduzca el desperdicio y evite roturas de stock priorizando los productos más solicitados.
+                </p>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-sm p-5 hover:shadow-md hover:-translate-y-0.5 transition-all">
+                <span class="w-12 h-12 rounded-xl bg-orange-50 text-primary flex items-center justify-center mb-3">
+                    <span class="material-symbols-outlined text-[22px]">local_shipping</span>
+                </span>
+                <h3 class="font-semibold text-text-dark mb-1">Mejora en Delivery</h3>
+                <p class="text-sm text-muted">
+                    Coordine de forma proactiva con los repartidores y mantenga los tiempos de espera al mínimo.
+                </p>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

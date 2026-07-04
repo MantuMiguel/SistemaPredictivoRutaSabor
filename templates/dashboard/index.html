@@ -1,0 +1,230 @@
+{% extends 'base.html' %}
+
+{% block title %}Panel de Control - Ruta del Sabor{% endblock %}
+{% block page_title %}Panel de Control{% endblock %}
+
+{% block content %}
+
+    <p class="text-muted text-sm mb-6 max-w-2xl">
+        Predicción de demanda para apoyar la planificación de cocina y delivery:
+        cuánto se va a pedir, de qué producto y en qué momento del día.
+    </p>
+
+    <!-- Cards de indicadores clave (valores de demostración, todavía no vienen del modelo) -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-white rounded-2xl shadow-sm p-5 flex items-start justify-between gap-3 hover:shadow-md hover:-translate-y-0.5 transition-all">
+            <div class="flex flex-col gap-1 min-w-0">
+                <span class="text-xs text-muted">Pedidos estimados del día</span>
+                <span class="text-2xl font-bold text-text-dark">185</span>
+                <span class="text-xs font-semibold text-primary-dark bg-orange-100 px-2 py-0.5 rounded-full w-fit">+12% vs. ayer</span>
+            </div>
+            <span class="w-11 h-11 rounded-full bg-primary text-white flex items-center justify-center shrink-0">
+                <span class="material-symbols-outlined text-[20px]">shopping_bag</span>
+            </span>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm p-5 flex items-start justify-between gap-3 hover:shadow-md hover:-translate-y-0.5 transition-all">
+            <div class="flex flex-col gap-1 min-w-0">
+                <span class="text-xs text-muted">Producto con mayor demanda</span>
+                <span class="text-2xl font-bold text-text-dark">Hamburguesa Clásica</span>
+                <span class="text-xs font-semibold text-red-700 bg-red-100 px-2 py-0.5 rounded-full w-fit">Alta demanda</span>
+            </div>
+            <span class="w-11 h-11 rounded-full bg-red-600 text-white flex items-center justify-center shrink-0">
+                <span class="material-symbols-outlined text-[20px]">lunch_dining</span>
+            </span>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm p-5 flex items-start justify-between gap-3 hover:shadow-md hover:-translate-y-0.5 transition-all">
+            <div class="flex flex-col gap-1 min-w-0">
+                <span class="text-xs text-muted">Franja horaria crítica</span>
+                <span class="text-2xl font-bold text-text-dark">19:00 - 21:00</span>
+                <span class="text-xs font-semibold text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full w-fit">Hora pico</span>
+            </div>
+            <span class="w-11 h-11 rounded-full bg-amber-600 text-white flex items-center justify-center shrink-0">
+                <span class="material-symbols-outlined text-[20px]">schedule</span>
+            </span>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm p-5 flex items-start justify-between gap-3 hover:shadow-md hover:-translate-y-0.5 transition-all">
+            <div class="flex flex-col gap-1 min-w-0">
+                <span class="text-xs text-muted">Promoción con mayor impacto</span>
+                <span class="text-2xl font-bold text-text-dark">Combo Familiar</span>
+                <span class="text-xs font-semibold text-green-700 bg-green-100 px-2 py-0.5 rounded-full w-fit">+8% en conversión</span>
+            </div>
+            <span class="w-11 h-11 rounded-full bg-green-600 text-white flex items-center justify-center shrink-0">
+                <span class="material-symbols-outlined text-[20px]">local_offer</span>
+            </span>
+        </div>
+    </div>
+
+    <!-- Predicción de demanda por horas: barras hechas solo con HTML + CSS -->
+    <div class="mt-10">
+        <h2 class="font-semibold text-text-dark mb-1">Predicción de demanda por horas</h2>
+        <p class="text-xs text-muted mb-4">Pedidos estimados por franja horaria (datos de demostración).</p>
+
+        <!-- AQUÍ LUEGO SE MOSTRARÁ LA PREDICCIÓN REAL DEL MODELO. -->
+        <div class="bg-white rounded-2xl shadow-sm p-6">
+            <div class="hour-chart__bars">
+                <div class="hour-bar">
+                    <div class="hour-bar__fill" style="height: 40%;"><span class="hour-bar__value">32</span></div>
+                    <span class="hour-bar__label">12p</span>
+                </div>
+                <div class="hour-bar">
+                    <div class="hour-bar__fill" style="height: 55%;"><span class="hour-bar__value">44</span></div>
+                    <span class="hour-bar__label">1p</span>
+                </div>
+                <div class="hour-bar">
+                    <div class="hour-bar__fill" style="height: 35%;"><span class="hour-bar__value">28</span></div>
+                    <span class="hour-bar__label">2p</span>
+                </div>
+                <div class="hour-bar">
+                    <div class="hour-bar__fill" style="height: 30%;"><span class="hour-bar__value">24</span></div>
+                    <span class="hour-bar__label">3p</span>
+                </div>
+                <div class="hour-bar">
+                    <div class="hour-bar__fill" style="height: 45%;"><span class="hour-bar__value">36</span></div>
+                    <span class="hour-bar__label">4p</span>
+                </div>
+                <div class="hour-bar">
+                    <div class="hour-bar__fill" style="height: 60%;"><span class="hour-bar__value">48</span></div>
+                    <span class="hour-bar__label">5p</span>
+                </div>
+                <div class="hour-bar">
+                    <div class="hour-bar__fill" style="height: 75%;"><span class="hour-bar__value">60</span></div>
+                    <span class="hour-bar__label">6p</span>
+                </div>
+                <div class="hour-bar hour-bar--critica">
+                    <div class="hour-bar__fill" style="height: 95%;"><span class="hour-bar__value">76</span></div>
+                    <span class="hour-bar__label">7p</span>
+                </div>
+                <div class="hour-bar hour-bar--critica">
+                    <div class="hour-bar__fill" style="height: 100%;"><span class="hour-bar__value">80</span></div>
+                    <span class="hour-bar__label">8p</span>
+                </div>
+            </div>
+            <div class="flex gap-5 mt-4 text-xs text-muted">
+                <span class="inline-flex items-center gap-1.5"><span class="legend-dot legend-dot--normal"></span>Demanda normal</span>
+                <span class="inline-flex items-center gap-1.5"><span class="legend-dot legend-dot--critica"></span>Hora crítica</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Productos con mayor demanda -->
+    <div class="mt-10">
+        <h2 class="font-semibold text-text-dark mb-1">Productos con mayor demanda</h2>
+        <p class="text-xs text-muted mb-4">Unidades estimadas para hoy (datos de demostración).</p>
+
+        <!-- AQUÍ LUEGO IRÁN LOS PRODUCTOS CALCULADOS DESDE EL DATASET. -->
+        <div class="bg-white rounded-2xl shadow-sm px-6 py-2">
+            <div class="product-row">
+                <div class="product-row__info">
+                    <span class="product-row__icon"><span class="material-symbols-outlined text-[18px]">lunch_dining</span></span>
+                    <span class="product-row__name">Hamburguesa Clásica</span>
+                </div>
+                <div class="product-row__bar"><div class="product-row__bar-fill" style="width: 81%;"></div></div>
+                <span class="product-row__value">62 uds.</span>
+            </div>
+            <div class="product-row">
+                <div class="product-row__info">
+                    <span class="product-row__icon"><span class="material-symbols-outlined text-[18px]">local_pizza</span></span>
+                    <span class="product-row__name">Pizza Personal</span>
+                </div>
+                <div class="product-row__bar"><div class="product-row__bar-fill" style="width: 62%;"></div></div>
+                <span class="product-row__value">48 uds.</span>
+            </div>
+            <div class="product-row">
+                <div class="product-row__info">
+                    <span class="product-row__icon"><span class="material-symbols-outlined text-[18px]">tapas</span></span>
+                    <span class="product-row__name">Salchipapa</span>
+                </div>
+                <div class="product-row__bar"><div class="product-row__bar-fill" style="width: 53%;"></div></div>
+                <span class="product-row__value">41 uds.</span>
+            </div>
+            <div class="product-row">
+                <div class="product-row__info">
+                    <span class="product-row__icon"><span class="material-symbols-outlined text-[18px]">set_meal</span></span>
+                    <span class="product-row__name">Combo Familiar</span>
+                </div>
+                <div class="product-row__bar"><div class="product-row__bar-fill" style="width: 45%;"></div></div>
+                <span class="product-row__value">35 uds.</span>
+            </div>
+            <div class="product-row">
+                <div class="product-row__info">
+                    <span class="product-row__icon"><span class="material-symbols-outlined text-[18px]">local_drink</span></span>
+                    <span class="product-row__name">Bebidas</span>
+                </div>
+                <div class="product-row__bar"><div class="product-row__bar-fill" style="width: 100%;"></div></div>
+                <span class="product-row__value">77 uds.</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alertas y recomendaciones para la planificación de cocina -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-10">
+        <div class="bg-white rounded-2xl shadow-sm p-5">
+            <h3 class="font-semibold text-text-dark mb-3 text-sm">Alertas operativas</h3>
+
+            <div class="alert-item alert-item--danger">
+                <span class="material-symbols-outlined text-[18px]">trending_up</span>
+                <span class="alert-item__desc">Pico de demanda previsto entre 7 p.m. y 9 p.m.</span>
+            </div>
+            <div class="alert-item alert-item--warning">
+                <span class="material-symbols-outlined text-[18px]">warning</span>
+                <span class="alert-item__desc">Stock bajo de papas fritas.</span>
+            </div>
+            <div class="alert-item alert-item--info">
+                <span class="material-symbols-outlined text-[18px]">restaurant</span>
+                <span class="alert-item__desc">Reforzar preparación de hamburguesas y combos.</span>
+            </div>
+            <div class="alert-item alert-item--info">
+                <span class="material-symbols-outlined text-[18px]">local_shipping</span>
+                <span class="alert-item__desc">Coordinar delivery antes de la hora pico.</span>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm p-5">
+            <h3 class="font-semibold text-text-dark mb-3 text-sm">Recomendaciones para cocina</h3>
+            <ul class="recommend-list">
+                <li><span class="material-symbols-outlined text-[18px]">schedule</span>Preparar insumos antes de la franja crítica.</li>
+                <li><span class="material-symbols-outlined text-[18px]">star</span>Priorizar productos con mayor demanda estimada.</li>
+                <li><span class="material-symbols-outlined text-[18px]">category</span>Organizar cocina por categorías.</li>
+                <li><span class="material-symbols-outlined text-[18px]">local_shipping</span>Anticipar empaques y coordinación de delivery.</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Problemas operativos que el sistema busca reducir -->
+    <div class="mt-10">
+        <h2 class="font-semibold text-text-dark mb-4">Problemas que resuelve</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="bg-white rounded-2xl shadow-sm p-5">
+                <span class="material-symbols-outlined text-red-600 mb-2 block">hourglass_top</span>
+                <h4 class="font-semibold text-text-dark text-sm mb-1">Retrasos operativos</h4>
+                <p class="text-xs text-muted">Acumulación de pedidos en horas de alta demanda.</p>
+            </div>
+            <div class="bg-white rounded-2xl shadow-sm p-5">
+                <span class="material-symbols-outlined text-amber-600 mb-2 block">device_hub</span>
+                <h4 class="font-semibold text-text-dark text-sm mb-1">Falta de coordinación</h4>
+                <p class="text-xs text-muted">Entre las áreas de pedidos, cocina y delivery.</p>
+            </div>
+            <div class="bg-white rounded-2xl shadow-sm p-5">
+                <span class="material-symbols-outlined text-primary mb-2 block">local_shipping</span>
+                <h4 class="font-semibold text-text-dark text-sm mb-1">Tiempos de entrega</h4>
+                <p class="text-xs text-muted">Incumplimiento de los tiempos prometidos.</p>
+            </div>
+            <div class="bg-white rounded-2xl shadow-sm p-5">
+                <span class="material-symbols-outlined text-stone-500 mb-2 block">psychology</span>
+                <h4 class="font-semibold text-text-dark text-sm mb-1">Dependencia manual</h4>
+                <p class="text-xs text-muted">Decisiones basadas solo en experiencia, sin datos.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Accesos directos a los demás módulos -->
+    <div class="mt-10 flex flex-wrap gap-3">
+        <a href="{% url 'datasets:index' %}" class="inline-flex items-center gap-2 border border-primary text-primary-dark hover:bg-orange-50 text-sm font-medium px-4 py-2 rounded-full transition-colors">Ver Dataset</a>
+        <a href="{% url 'machine_learning:index' %}" class="inline-flex items-center gap-2 border border-primary text-primary-dark hover:bg-orange-50 text-sm font-medium px-4 py-2 rounded-full transition-colors">Ver Modelo Predictivo</a>
+        <a href="{% url 'predicciones:index' %}" class="inline-flex items-center gap-2 bg-primary hover:bg-primary-dark text-white text-sm font-medium px-4 py-2 rounded-full transition-colors">Ir a Predicciones</a>
+    </div>
+
+{% endblock %}

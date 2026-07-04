@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block title %}Modelo Predictivo - Ruta del Sabor{% endblock %}
+{% block page_title %}Modelo Predictivo{% endblock %}
+
+{% block content %}
+
+    <p class="text-muted text-sm mb-6 max-w-2xl">
+        Configuración, variables y rendimiento del modelo de predicción de demanda.
+        Algoritmo seleccionado: <strong class="text-text-dark">Random Forest Regressor</strong>.
+        Variable objetivo: <strong class="text-text-dark">cantidad_pedidos</strong>.
+    </p>
+
+    <!-- Variables predictoras que usará el modelo -->
+    <div class="mb-10">
+        <h2 class="font-semibold text-text-dark mb-3">Variables de entrada</h2>
+        <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-wrap gap-2">
+            <span class="variable-chip">dia_semana</span>
+            <span class="variable-chip">es_fin_semana</span>
+            <span class="variable-chip">hora</span>
+            <span class="variable-chip">franja_horaria</span>
+            <span class="variable-chip">producto_nombre</span>
+            <span class="variable-chip">categoria</span>
+            <span class="variable-chip">precio_unitario</span>
+            <span class="variable-chip">promo_activa</span>
+            <span class="variable-chip">tipo_promocion</span>
+            <span class="variable-chip">descuento_pct</span>
+            <span class="variable-chip">pedidos_dia_anterior</span>
+            <span class="variable-chip">promedio_7dias</span>
+        </div>
+    </div>
+
+    <!-- Cards de métricas del modelo (valores de ejemplo, todavía no viene de un entrenamiento real) -->
+    <div class="mb-2">
+        <h2 class="font-semibold text-text-dark mb-3">Métricas del modelo</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="bg-white rounded-2xl shadow-sm p-5 hover:shadow-md hover:-translate-y-0.5 transition-all">
+                <span class="text-xs text-muted block mb-1">MAE</span>
+                <span class="text-2xl font-bold text-primary-dark">4.82</span>
+            </div>
+            <div class="bg-white rounded-2xl shadow-sm p-5 hover:shadow-md hover:-translate-y-0.5 transition-all">
+                <span class="text-xs text-muted block mb-1">MSE</span>
+                <span class="text-2xl font-bold text-primary-dark">38.15</span>
+            </div>
+            <div class="bg-white rounded-2xl shadow-sm p-5 hover:shadow-md hover:-translate-y-0.5 transition-all">
+                <span class="text-xs text-muted block mb-1">RMSE</span>
+                <span class="text-2xl font-bold text-primary-dark">6.18</span>
+            </div>
+            <div class="bg-white rounded-2xl shadow-sm p-5 hover:shadow-md hover:-translate-y-0.5 transition-all">
+                <span class="text-xs text-muted block mb-1">R&sup2;</span>
+                <span class="text-2xl font-bold text-primary-dark">0.87</span>
+            </div>
+        </div>
+    </div>
+    <p class="text-xs text-muted mt-3">Métricas de ejemplo. Se actualizarán cuando el modelo se entrene con datos reales.</p>
+
+    <!-- Espacios reservados para gráficos del modelo -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-10">
+        <div>
+            <h3 class="text-sm font-medium text-muted mb-2">Demanda real vs demanda predicha</h3>
+            <div class="chart-placeholder">
+                <span class="material-symbols-outlined text-[22px]">bar_chart</span>
+                Gráfico próximamente
+            </div>
+        </div>
+        <div>
+            <h3 class="text-sm font-medium text-muted mb-2">Importancia de variables</h3>
+            <div class="chart-placeholder">
+                <span class="material-symbols-outlined text-[22px]">bar_chart</span>
+                Gráfico próximamente
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
