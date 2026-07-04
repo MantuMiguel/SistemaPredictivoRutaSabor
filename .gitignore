@@ -1,0 +1,38 @@
+# Entorno virtual
+venv/
+.venv/
+env/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+
+# Django
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Variables de entorno
+.env
+
+# Archivos generados por Machine Learning
+media/models/
+media/charts/
+media/datasets/
+*.joblib
+
+# Archivos temporales
+*.tmp
+*.bak
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
