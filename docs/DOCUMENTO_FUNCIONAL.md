@@ -108,12 +108,15 @@ config/                  # Proyecto Django (settings, urls raíz)
 ├── templates/            # base.html + templates por módulo
 ├── static/               # css/styles.css, js/*.js
 └── media/                # Reservado para archivos subidos (Dataset) — actualmente vacío
+    └── charts/           # PLANEADO, no creado todavía — guardará los 9 gráficos Matplotlib (sección 14.1)
 ```
 
 Características actuales de la arquitectura (estado real verificado en el código):
 
 - **Sin modelos de base de datos propios**: los 4 archivos `models.py` de las apps están vacíos (solo el boilerplate de Django). No existe persistencia de dataset, entrenamientos ni predicciones — todo lo mostrado en las plantillas es **contenido de demostración estático**.
-- **Sin dependencias de Machine Learning instaladas**: no hay `pandas`, `numpy` ni `scikit-learn` en el entorno virtual. El módulo `machine_learning/services/` existe como carpeta pero solo contiene un `__init__.py` vacío.
+- **Sin dependencias de Machine Learning instaladas**: no hay `pandas`, `numpy`, `scikit-learn` ni `matplotlib` en el entorno virtual. El módulo `machine_learning/services/` existe como carpeta pero solo contiene un `__init__.py` vacío.
+- **`media/charts/` todavía no existe**: es la carpeta planeada para los 9 gráficos generados con Matplotlib (sección 14.1); no se crea en esta fase porque no hay lógica de entrenamiento real que la use todavía.
+- **El dataset oficial se generará externamente**: no se produce dentro de este proyecto ni con un script propio; se recibirá como archivo CSV/XLSX y se cargará a través del módulo Dataset una vez implementada la validación real (sección 12.6).
 - **Sin autenticación**: `django.contrib.auth` está instalado por defecto de Django pero no se usa en ninguna vista; no hay login, no hay decoradores de permisos.
 - **Presentación**: Tailwind CSS vía CDN + Material Symbols, sin Bootstrap. Este documento no modifica nada de esa capa.
 
@@ -178,7 +181,7 @@ Este es el **flujo de datos** (de dónde viene la información y hacia dónde va
 
 **No debe:** entrenar modelos ni hacer predicciones.
 
-**Estado actual:** existe carga de archivo `.csv`/`.xlsx` con validación **únicamente de extensión** (en JavaScript, sin backend), 4 cards de resumen (total de registros, rango de fechas, productos registrados, última actualización) y una tabla de vista previa con 14 columnas de ejemplo. **Brechas identificadas:** no muestra cantidad de columnas, valores faltantes, columnas detectadas explícitamente, ni errores por columnas obligatorias faltantes — ver detalle en sección 21 y en el Anexo.
+**Estado actual:** ya cubre visualmente casi todo lo requerido — carga de archivo `.csv`/`.xlsx`, botón "Validar dataset", estado vacío amigable, 5 cards de resumen (estado del dataset, registros detectados, columnas detectadas, periodo histórico, valores faltantes), sección de columnas esperadas (obligatorias y opcionales, sección 12.2/12.3), advertencia de ejemplo por columnas opcionales faltantes, y vista previa con las 10 columnas obligatorias oficiales. **Brecha identificada:** la validación sigue siendo **solo de extensión** (JavaScript, sin backend); falta implementar con Pandas la lectura real de encabezados y la lógica de aceptación/rechazo de la sección 12.6 — pendiente para cuando se reciba el archivo oficial (ver sección 21).
 
 ### 8.4 Modelo Predictivo
 
@@ -188,11 +191,11 @@ Este es el **flujo de datos** (de dónde viene la información y hacia dónde va
 
 **Modelos oficiales:** Regresión Lineal Múltiple y Random Forest Regressor.
 
-**Debe mostrar:** MAE, RMSE, R², tiempo de entrenamiento, variables utilizadas, importancia de variables, mejor modelo seleccionado, fecha del último entrenamiento, estado del modelo.
+**Debe mostrar:** MAE, RMSE, R², tiempo de entrenamiento, variables utilizadas, importancia de variables, mejor modelo seleccionado, fecha del último entrenamiento, estado del modelo, y los **9 gráficos generados con Matplotlib** (procesamiento con Pandas) descritos en la sección 14.1: demanda por franja horaria, productos más vendidos, comparación de modelos por MAE/RMSE/R², reales vs. predichos (Regresión Lineal y Random Forest), importancia de variables (Random Forest) y coeficientes (Regresión Lineal).
 
 **No debe:** cargar dataset ni ofrecer la consulta de predicciones futuras como función principal.
 
-**Estado actual:** este es el módulo **más alineado** con la especificación. Ya muestra estado del modelo, R², variable más influyente, último entrenamiento, botón "Entrenar modelo" (simulado con un modal JS), comparación Regresión Lineal vs. Random Forest con MAE/RMSE/R², ranking de importancia de variables y un flujo visual Dataset → Procesamiento → Entrenamiento → Predicción. **Brecha identificada:** no muestra explícitamente el **tiempo de entrenamiento** como dato independiente, ni un indicador textual de "modelo guardado/disponible para predicciones" distinto del estado general.
+**Estado actual:** este es el módulo **más alineado** con la especificación en cuanto a métricas y flujo. Ya muestra estado del modelo, R², variable más influyente, último entrenamiento, botón "Entrenar modelo" (simulado con un modal JS), comparación Regresión Lineal vs. Random Forest con MAE/RMSE/R², ranking de importancia de variables y un flujo visual Dataset → Procesamiento → Entrenamiento → Predicción. **Brechas identificadas:** (1) no muestra explícitamente el **tiempo de entrenamiento** como dato independiente; (2) no existe todavía ningún **gráfico Matplotlib** — los 9 gráficos de la sección 14.1 están **especificados pero no implementados**, y no existe la carpeta `media/charts/` ni la dependencia de Pandas/Matplotlib instalada en el entorno.
 
 ### 8.5 Predicciones
 
@@ -346,117 +349,116 @@ Catálogo sugerido (12 productos activos, dentro del rango de 10 a 15):
 
 Esto da **5 categorías** (Hamburguesas, Pollo, Papas/Salchipapas, Pizzas, Sándwiches, Bebidas — 6 si se separa Sándwiches de Pollo, como se hizo aquí), catálogo "limitado pero variado" acorde a una empresa pequeña. Este catálogo alimenta directamente las reglas de recomendación por categoría de la sección 11.2 (Pollo, Hamburguesas, Papas/Salchipapas ya están cubiertas 1:1 por esta lista).
 
-### 12.2 Variables temporales
+### 12.2 Columnas obligatorias del archivo importado
 
-| Variable | Tipo | Descripción |
-|---|---|---|
-| `fecha` | Fecha | Fecha del registro |
-| `dia_semana` | Categórica | Lunes … Domingo |
-| `mes` | Categórica/Numérica | Mes del año (estacionalidad) |
-| `franja_horaria` | Categórica | **Desayuno / Almuerzo / Cena** (única granularidad horaria del dataset; ver nota de alineación arriba) |
-| `es_fin_semana` | Booleana | Sábado/Domingo |
-| `es_feriado` | Booleana | Feriado o fecha especial |
+> **Actualizado (2026-07-04, v2):** esta lista es ahora la **oficial y definitiva** para la lógica de importación real (reemplaza el listado tentativo de la versión anterior de este documento, que incluía `dia_semana` como obligatoria y dejaba `precio_unitario`/`tipo_promocion`/`descuento` como opcionales). Ya está reflejada 1:1 en `templates/datasets/index.html`.
 
-### 12.3 Variables comerciales
+Si el archivo **no** incluye alguna de estas 10 columnas, debe **rechazarse** por completo (no se procesa ni parcialmente):
 
-| Variable | Tipo | Descripción |
-|---|---|---|
-| `producto` | Categórica | Nombre del producto (catálogo de 12, sección 12.1) |
-| `categoria` | Categórica | Categoría del producto (Hamburguesas, Pollo, Papas/Salchipapas, Pizzas, Sándwiches, Bebidas) |
-| `cantidad` | Numérica | Unidades vendidas de ese producto, en esa fecha y franja (dato agregado, no por transacción) |
-| `precio_unitario` | Numérica | Precio unitario del producto |
-| `total_venta` | Numérica | `cantidad * precio_unitario` (o con descuento aplicado) |
-| `canal_venta` | Categórica | Local / Delivery |
-| `promocion_activa` | Booleana | Si hubo promoción vigente |
-| `tipo_promocion` | Categórica | Combo / 2x1 / Descuento / Ninguna |
-| `descuento` | Numérica | % de descuento aplicado |
+| # | Variable | Tipo | Descripción |
+|---|---|---|---|
+| 1 | `fecha` | Fecha | Fecha de la venta agregada |
+| 2 | `franja_horaria` | Categórica | **Desayuno / Almuerzo / Cena** — granularidad horaria oficial del dataset (ver nota de alineación arriba) |
+| 3 | `producto` | Categórica | Nombre del producto (catálogo de 12, sección 12.1) |
+| 4 | `categoria` | Categórica | Categoría del producto (Hamburguesas, Pollo, Papas/Salchipapas, Pizzas, Sándwiches, Bebidas) |
+| 5 | `cantidad_vendida` | Numérica | Unidades vendidas de ese producto, en esa fecha y franja (dato agregado, no por transacción) |
+| 6 | `canal_venta` | Categórica | Local / Delivery |
+| 7 | `promocion_activa` | Booleana | Si hubo promoción vigente |
+| 8 | `tipo_promocion` | Categórica | Combo / 2x1 / Descuento / Ninguna |
+| 9 | `descuento_pct` | Numérica | % de descuento aplicado |
+| 10 | `precio_unitario` | Numérica | Precio unitario del producto |
 
-### 12.4 Variables climáticas
+### 12.3 Columnas opcionales del archivo importado
 
-| Variable | Tipo | Descripción |
-|---|---|---|
-| `clima` | Categórica | Soleado / Nublado / Lluvioso, etc. |
-| `temperatura` | Numérica | Temperatura del día |
-| `lluvia` | Booleana/Numérica | Si llovió / milímetros de lluvia |
+Si faltan una o más de estas 7 columnas, el archivo **se acepta igual**, pero el sistema debe mostrar una **advertencia** indicando cuáles faltan y que el modelo se entrenará con menos variables de enriquecimiento:
 
-### 12.5 Variables operativas
+| # | Variable | Tipo | Descripción |
+|---|---|---|---|
+| 1 | `clima` | Categórica | Soleado / Nublado / Lluvioso, etc. |
+| 2 | `temperatura` | Numérica | Temperatura del día |
+| 3 | `lluvia` | Booleana/Numérica | Si llovió / milímetros de lluvia |
+| 4 | `personal_disponible` | Numérica | Personal en turno |
+| 5 | `tiempo_preparacion_min` | Numérica | Minutos promedio de preparación |
+| 6 | `stock_disponible` | Numérica/Booleana | Disponibilidad de insumos clave |
+| 7 | `porcentaje_delivery` | Numérica | % de pedidos por delivery ese día/franja |
 
-| Variable | Tipo | Descripción |
-|---|---|---|
-| `personal_disponible` | Numérica | Personal en turno |
-| `tiempo_preparacion_promedio` | Numérica | Minutos promedio de preparación |
-| `delivery_porcentaje` | Numérica | % de pedidos por delivery ese día/franja |
-| `stock_disponible` | Numérica/Booleana | Disponibilidad de insumos clave |
-| `pedidos_dia_anterior` | Numérica | Pedidos del día inmediatamente anterior |
+### 12.4 Variables calculadas por el sistema (no se piden en el archivo)
 
-### 12.6 Variables derivadas/calculadas
+Estas variables **no deben exigirse** en el CSV/XLSX importado — el sistema las calcula automáticamente a partir de las columnas de las secciones 12.2/12.3, antes o durante el entrenamiento:
 
-| Variable | Tipo | Descripción |
-|---|---|---|
-| `promedio_ultimos_7_dias` | Numérica | Promedio móvil de 7 días |
-| `demanda_promedio_categoria` | Numérica | Promedio histórico de demanda por categoría |
-| `demanda_promedio_producto` | Numérica | Promedio histórico de demanda por producto |
-| `nivel_demanda` | Categórica | Baja / Media / Alta (derivada de reglas, sección 11.1) |
-| `nivel_operacion` | Categórica | Normal / Exigente / Crítico |
+| Variable | Se calcula a partir de |
+|---|---|
+| `dia_semana`, `mes`, `es_fin_semana`, `es_feriado` | `fecha` |
+| `total_venta` | `cantidad_vendida * precio_unitario` (con `descuento_pct` aplicado) |
+| `pedidos_dia_anterior`, `promedio_ultimos_7_dias` | Serie histórica agregada por `fecha` |
+| `demanda_promedio_categoria`, `demanda_promedio_producto` | Histórico agregado por `categoria` / `producto` |
+| `nivel_demanda`, `nivel_operacion` | Reglas de negocio (sección 11.1), aplicadas sobre la predicción, no sobre el archivo cargado |
 
-### 12.7 Variables objetivo
+### 12.5 Variables objetivo
 
 El enfoque de Machine Learning se mantiene en dos frentes de predicción, alineados 1:1 con estas dos variables objetivo:
 
 | Variable | Rol |
 |---|---|
-| `pedidos_estimados` (o `cantidad_pedidos`) | **Variable objetivo principal** — predicción de la **demanda total por franja horaria** (Desayuno/Almuerzo/Cena). |
-| `cantidad` / `demanda_producto` por producto | **Variable objetivo secundaria** — predicción de la **cantidad vendida por producto**, para el ranking de "productos más demandados". |
+| `pedidos_estimados` (o `cantidad_pedidos`, agregado a partir de `cantidad_vendida`) | **Variable objetivo principal** — predicción de la **demanda total por franja horaria** (Desayuno/Almuerzo/Cena). |
+| `cantidad_vendida` por producto (`demanda_producto`) | **Variable objetivo secundaria** — predicción de la **cantidad vendida por producto**, para el ranking de "productos más demandados". |
 
-### 12.8 Clasificación de variables: obligatorias vs. opcionales
+### 12.6 Lógica de importación y validación (especificación para el backend)
 
-> **Procedencia del dataset:** el dataset oficial **será generado externamente** (fuera de este proyecto) y luego entregado como archivo **CSV o XLSX** para ser incorporado al módulo Dataset. Este documento **no genera datos sintéticos** ni define un script generador — solo especifica la estructura (esquema) que ese archivo deberá cumplir, para que el módulo Dataset pueda validarlo al recibirlo.
+Esta es la regla formal que debe implementar el backend del módulo Dataset (con Pandas) al recibir un archivo real — **todavía no implementada**, solo especificada aquí y ya simulada visualmente en la plantilla:
 
-Para que el validador de estructura del módulo Dataset (sección 8.3 / 21.1) tenga un criterio objetivo de aceptación/rechazo, cada variable de las secciones 12.2 a 12.6 se clasifica como **obligatoria** (el archivo se rechaza si falta) u **opcional** (el archivo se acepta igual, pero sin poder usar esa variable como feature de enriquecimiento):
-
-**Obligatorias (mínimo viable para entrenar):**
-
-| Variable | Bloque | Motivo por el que es obligatoria |
-|---|---|---|
-| `fecha` | Temporal | Ancla toda la serie histórica; sin ella no hay orden temporal. |
-| `dia_semana` | Temporal | Insumo directo de reglas de negocio (fin de semana) y variable de alta importancia esperada. |
-| `franja_horaria` | Temporal | Nivel de agregación oficial del dataset (Desayuno/Almuerzo/Cena); define la granularidad de cada fila. |
-| `producto` | Comercial | Sin esta columna no existe la variable objetivo secundaria (demanda por producto). |
-| `categoria` | Comercial | Necesaria para las reglas de recomendación por categoría (sección 11.2) y el catálogo (12.1). |
-| `cantidad` | Comercial | Base de ambas variables objetivo (agregada = demanda total; desagregada por producto = demanda por producto). |
-| `canal_venta` | Comercial | Necesaria para la regla de recomendación de Delivery (sección 11.2). |
-| `promocion_activa` | Comercial | Necesaria para separar el efecto de promociones del comportamiento base de demanda. |
-| `pedidos_estimados` / `cantidad_pedidos` (agregado) | Objetivo | Variable objetivo principal — sin ella no hay problema de regresión que resolver. |
-
-**Opcionales (enriquecen el modelo pero no bloquean la carga):**
-
-| Variable | Bloque | Motivo por el que es opcional |
-|---|---|---|
-| `mes`, `es_fin_semana`, `es_feriado` | Temporal | Pueden derivarse de `fecha` si no vienen explícitas (cálculo automático en el backend). |
-| `precio_unitario`, `total_venta`, `tipo_promocion`, `descuento` | Comercial | Enriquecen el análisis económico, pero no son indispensables para predecir cantidades/demanda. |
-| `clima`, `temperatura`, `lluvia` | Climática | Bloque completo opcional — muchas empresas pequeñas no llevan este registro; el modelo debe poder entrenarse sin él. |
-| `personal_disponible`, `tiempo_preparacion_promedio`, `delivery_porcentaje`, `stock_disponible` | Operativa | Deseables para las recomendaciones de Personal/Operación (sección 20), pero no bloquean el entrenamiento del modelo de demanda. |
-| `pedidos_dia_anterior`, `promedio_ultimos_7_dias`, `demanda_promedio_categoria`, `demanda_promedio_producto` | Derivada | Todas son **calculables por el propio sistema** a partir de `fecha` + `cantidad` si no vienen en el archivo original; no deberían exigirse como columnas de entrada. |
-| `nivel_demanda`, `nivel_operacion` | Derivada | Son salidas de las reglas de negocio (sección 11.1), no entradas — el sistema las calcula, no se le exigen al archivo cargado. |
-
-Esta tabla (obligatorias vs. opcionales) es la que debe usar el validador de estructura que se implemente en el módulo Dataset durante la siguiente fase técnica, reemplazando la validación actual (que solo revisa la extensión del archivo, sin mirar columnas).
+1. Verificar extensión (`.csv` o `.xlsx`). Si no corresponde → **rechazar**, mensaje de formato no soportado.
+2. Leer los encabezados del archivo (sin cargar todo el contenido a memoria si el archivo es grande).
+3. Comparar los encabezados contra las **10 columnas obligatorias** (sección 12.2).
+   - Si falta **una o más** → **rechazar el dataset completo**, listando exactamente qué columnas obligatorias faltan.
+4. Comparar los encabezados contra las **7 columnas opcionales** (sección 12.3).
+   - Si falta una o más → **aceptar igual**, pero mostrar una advertencia listando cuáles faltan (tal como ya se simula en `templates/datasets/index.html`).
+5. Si pasa 3 y 4 → marcar el dataset como **"Válido"**, calcular el resumen (registros, columnas detectadas, periodo histórico, % de valores faltantes) y dejarlo disponible para el módulo Modelo Predictivo.
+6. El sistema **acepta cualquier archivo** que cumpla este esquema — no depende de nombres de archivo, tamaño exacto de filas ni de un generador específico, ya que el dataset oficial se producirá **externamente** y se cargará después.
 
 ## 13. Validación del dataset actual contra el dataset objetivo
 
-Se comparó la tabla de columnas mostrada actualmente en `templates/datasets/index.html` contra el dataset objetivo de la sección 12. El resultado detallado, columna por columna, está en el **Anexo (sección 23)**. Resumen:
+Se comparó la tabla de columnas mostrada actualmente en `templates/datasets/index.html` contra el esquema oficial de la sección 12. El resultado detallado está en el **Anexo (sección 23)**. Resumen:
 
-- El dataset **actual es una demostración visual de 14 columnas hardcodeadas en el HTML** (3 filas de ejemplo), no un dataset real cargado ni persistido. No existe archivo CSV/Excel real en el repositorio (`media/` está vacío) ni modelo de base de datos que lo represente.
-- De las ~30 variables del dataset objetivo, el dataset actual **cubre parcialmente el bloque temporal y comercial**, pero **no cubre en absoluto** las variables climáticas, la mayoría de las operativas, ni las variables derivadas de nivel de demanda/operación.
-- **Conclusión:** el dataset actual **no cumple** con el flujo completo del sistema tal como se especifica en esta fase. Es apto como *mockup visual* de la tabla de vista previa, pero no como base real de entrenamiento. Ver plan de columnas faltantes en el Anexo.
+- El módulo Dataset **ya refleja visualmente el esquema oficial**: la vista previa usa exactamente las 10 columnas obligatorias de la sección 12.2 (`fecha, franja_horaria, producto, categoria, cantidad_vendida, canal_venta, promocion_activa, tipo_promocion, descuento_pct, precio_unitario`), la sección "Columnas esperadas" lista las 7 opcionales de 12.3, y existe un estado vacío + una advertencia de ejemplo por columnas opcionales faltantes. Esto es **coherente en estructura** con el dataset objetivo.
+- Sigue siendo, sin embargo, **una demostración**: no hay archivo real cargado (`media/` está vacío), no hay backend con Pandas leyendo el archivo, y la validación de JavaScript solo revisa la **extensión** (`.csv`/`.xlsx`), no el contenido ni los encabezados reales. La lógica de importación real (sección 12.6) está **especificada pero no implementada**.
+- **Conclusión:** el dataset actual **no cumple todavía** con el flujo funcional completo (falta el backend de carga/validación real), pero la plantilla ya está **estructuralmente lista** para recibir el archivo oficial y aplicar la lógica de la sección 12.6 en cuanto se implemente.
 
 ## 14. Arquitectura Machine Learning
 
 - **Tipo de aprendizaje:** Supervisado.
 - **Tipo de problema:** Regresión (variable objetivo numérica y continua: cantidad de pedidos / unidades).
-- **Entrada (features):** subconjunto de las variables temporales, comerciales, climáticas y operativas del dataset objetivo (sección 12), según el modelo entrenado y su selección de variables.
-- **Salida (target):** `pedidos_estimados` (nivel general/turno) y `demanda_producto` (nivel producto).
+- **Entrada (features):** subconjunto de las columnas obligatorias y opcionales del dataset oficial (secciones 12.2/12.3), más las variables calculadas por el sistema (12.4), según el modelo entrenado y su selección de variables.
+- **Salida (target):** `pedidos_estimados` (nivel general/franja horaria) y `demanda_producto` (nivel producto).
 - **Selección de modelo:** automática, por comparación de métricas de error (MAE, RMSE) y ajuste (R²) entre los modelos oficiales.
 - **Persistencia del modelo:** pendiente de diseño — hoy no existe capa de almacenamiento de modelos entrenados (ni en BD ni en archivo serializado). Es un requisito a definir en la siguiente fase técnica, fuera del alcance de este documento.
+- **Librería de procesamiento:** **Pandas** — leerá el archivo importado (CSV/XLSX), aplicará la validación de la sección 12.6, calculará las variables derivadas (12.4) y preparará las matrices de entrenamiento/prueba para ambos modelos. **Todavía no está instalada** en el entorno (`venv`) ni usada en ningún `views.py`.
+- **Librería de visualización:** **Matplotlib** — generará los 9 gráficos oficiales (sección 14.1) como imágenes estáticas, no como gráficos interactivos en el navegador. **Todavía no está instalada** ni integrada.
+
+### 14.1 Generación de gráficos (Pandas + Matplotlib)
+
+> **Estado: especificado, no implementado.** Esta subsección documenta el enfoque a construir en una fase técnica posterior. No se ha escrito código de generación de gráficos, no se ha instalado Matplotlib, y no se ha creado la carpeta `media/charts/`.
+
+**Flujo previsto:** durante el entrenamiento (sección 17), el módulo Modelo Predictivo usará Pandas para preparar los datos y Matplotlib para renderizar cada gráfico como imagen (`.png`), guardándolas en `media/charts/` con un nombre de archivo estable (ej. `demanda_por_franja.png`, `mae_comparacion.png`). Las vistas Django las mostrarán luego con una etiqueta `<img>` apuntando a la URL de `MEDIA_URL` (`/media/charts/...`) — no se generan en el navegador ni con librerías JS de gráficos.
+
+| # | Gráfico | Tipo sugerido | Fuente de datos | Módulo donde se muestra |
+|---|---|---|---|---|
+| 1 | Demanda por franja horaria | Barras (Desayuno/Almuerzo/Cena) | Dataset agregado por `franja_horaria` | Modelo Predictivo (exploratorio) y/o Predicciones |
+| 2 | Productos más vendidos | Barras horizontales, top N | Dataset agregado por `producto` | Modelo Predictivo (exploratorio) y/o Predicciones |
+| 3 | Comparación de modelos por MAE | Barras (Regresión Lineal vs. Random Forest) | Resultado de evaluación de ambos modelos | Modelo Predictivo |
+| 4 | Comparación de modelos por RMSE | Barras (Regresión Lineal vs. Random Forest) | Resultado de evaluación de ambos modelos | Modelo Predictivo |
+| 5 | Comparación de modelos por R² | Barras (Regresión Lineal vs. Random Forest) | Resultado de evaluación de ambos modelos | Modelo Predictivo |
+| 6 | Reales vs. predichos — Regresión Lineal | Dispersión (scatter) | Predicciones del modelo sobre el set de prueba | Modelo Predictivo |
+| 7 | Reales vs. predichos — Random Forest | Dispersión (scatter) | Predicciones del modelo sobre el set de prueba | Modelo Predictivo |
+| 8 | Importancia de variables — Random Forest | Barras horizontales | `feature_importances_` del modelo entrenado | Modelo Predictivo |
+| 9 | Coeficientes — Regresión Lineal | Barras horizontales (positivo/negativo) | `coef_` del modelo entrenado | Modelo Predictivo |
+
+**Notas de diseño para la implementación futura:**
+
+- Los gráficos #1 y #2 son de **exploración de datos** (no dependen de haber entrenado un modelo) — podrían generarse apenas el Dataset se valide, no solo durante el entrenamiento.
+- Los gráficos #3 a #9 son de **evaluación de modelo** — solo tienen sentido después de un entrenamiento completo, y deben regenerarse (sobrescribiendo el archivo anterior) cada vez que se reentrena.
+- `media/charts/` no existe todavía en el repositorio; deberá crearse junto con la lógica de entrenamiento, y `MEDIA_ROOT`/`MEDIA_URL` (ya configurados en `settings.py`) son suficientes para servirla sin cambios adicionales de configuración.
+- Ninguno de estos 9 gráficos se muestra hoy en ninguna plantilla — es trabajo pendiente completo para la fase de implementación real del entrenamiento.
 
 ## 15. Modelos utilizados
 
@@ -491,17 +493,21 @@ El **tiempo de entrenamiento** se documenta como un dato adicional a mostrar (no
 ```
 1. El administrador entra a "Modelo Predictivo" y presiona "Entrenar modelo".
 2. El sistema toma el dataset validado desde el módulo Dataset (no lo vuelve a pedir).
-3. Se separan variables de entrada (features) y variable objetivo (target).
+3. Con Pandas: se calculan las variables derivadas (sección 12.4) y se separan
+   variables de entrada (features) y variable objetivo (target).
 4. Se entrena Regresión Lineal Múltiple con el set de entrenamiento.
 5. Se entrena Random Forest Regressor con el mismo set de entrenamiento.
 6. Se evalúan ambos modelos sobre un set de prueba (holdout) con MAE, RMSE y R².
 7. Se registra el tiempo de entrenamiento de cada modelo.
 8. El sistema compara métricas y selecciona automáticamente el mejor modelo.
-9. Se marca ese modelo como "disponible para Predicciones" junto con la fecha/hora del entrenamiento.
-10. Se actualizan las cards de Modelo Predictivo y del Dashboard (estado, R², último entrenamiento).
+9. Con Matplotlib: se generan y guardan en media/charts/ los 9 gráficos
+   oficiales (sección 14.1), sobrescribiendo los de la corrida anterior.
+10. Se marca ese modelo como "disponible para Predicciones" junto con la fecha/hora del entrenamiento.
+11. Se actualizan las cards de Modelo Predictivo y del Dashboard (estado, R², último entrenamiento)
+    y se muestran los gráficos recién generados en la vista de Modelo Predictivo.
 ```
 
-**Estado actual:** los pasos 2 a 9 son simulados (sin backend real); el botón "Entrenar modelo" dispara un modal de JavaScript que cambia textos con `setTimeout`, sin tocar datos reales. Es el comportamiento correcto **para esta fase de documentación**, pero debe quedar explícito que **no hay entrenamiento real todavía**.
+**Estado actual:** los pasos 2 a 11 son simulados (sin backend real); el botón "Entrenar modelo" dispara un modal de JavaScript que cambia textos con `setTimeout`, sin tocar datos reales ni generar gráficos. Es el comportamiento correcto **para esta fase de documentación**, pero debe quedar explícito que **no hay entrenamiento real ni generación de gráficos todavía** — ambos (Pandas y Matplotlib) están únicamente especificados (secciones 12.6 y 14.1).
 
 ## 18. Flujo de predicción
 
@@ -575,14 +581,17 @@ Esta sección resume, módulo por módulo, los ajustes **funcionales** (no visua
 
 | Requerido | Estado actual | Ajuste necesario |
 |---|---|---|
-| Cantidad de registros | ✅ Mostrado (KPI "Total de registros") | Ninguno |
-| Cantidad de columnas | ❌ No mostrado | Agregar KPI o dato explícito |
-| Periodo histórico | ✅ Mostrado como "Rango de fechas" | Ninguno |
-| Valores faltantes | ❌ No mostrado | Agregar indicador de % o cantidad de valores faltantes |
-| Vista previa | ✅ Tabla de ejemplo | Ninguno (falta que sea dinámica, no hardcodeada) |
-| Estado de validación | ⚠️ Parcial (mensaje de éxito/error de carga, solo por extensión) | Ampliar a validación real de estructura/columnas |
-| Columnas detectadas | ❌ No se listan explícitamente | Agregar listado de columnas detectadas en el archivo subido |
-| Errores por columnas obligatorias faltantes | ❌ No existe | Definir columnas obligatorias (sección 12) y mostrar error específico si faltan |
+| Cantidad de registros | ✅ Mostrado ("Registros detectados") | Ninguno visual; pendiente cálculo real |
+| Cantidad de columnas | ✅ Mostrado ("Columnas detectadas", ej. "14/17") | Ninguno visual; pendiente cálculo real |
+| Periodo histórico | ✅ Mostrado ("Periodo histórico") | Ninguno |
+| Valores faltantes | ✅ Mostrado (% en card de resumen) | Ninguno visual; pendiente cálculo real |
+| Vista previa | ✅ Tabla con las 10 columnas obligatorias oficiales | Ninguno visual (falta que sea dinámica, no hardcodeada) |
+| Estado de validación | ✅ Mostrado (card "Estado del dataset" + estado vacío) | Ninguno visual |
+| Columnas detectadas (listado) | ✅ Sección "Columnas esperadas" (obligatorias/opcionales) | Ninguno visual; falta marcar cuáles de esas SÍ vinieron en el archivo real |
+| Advertencia por columnas opcionales faltantes | ✅ Mostrado (ejemplo estático) | Ninguno visual; pendiente cálculo real |
+| Errores por columnas obligatorias faltantes | ⚠️ Solo valida extensión, no columnas | Implementar con Pandas la lógica de la sección 12.6 (leer encabezados y comparar contra 12.2) |
+
+**Conclusión:** el módulo Dataset ya está **visualmente completo y estructurado** según el esquema oficial (secciones 12.2/12.3). El único ajuste pendiente es de backend, no de vista: reemplazar la validación de solo-extensión por la lógica real de la sección 12.6 usando Pandas, cuando se reciba el archivo oficial.
 
 ### 21.2 Modelo Predictivo
 
@@ -594,12 +603,13 @@ Esta sección resume, módulo por módulo, los ajustes **funcionales** (no visua
 | MAE / RMSE / R² | ✅ Mostrado para ambos modelos | Ninguno |
 | Tiempo de entrenamiento | ❌ No mostrado | Agregar dato explícito por modelo |
 | Variables utilizadas | ✅ Mostrado ("Variables de entrada") | Ninguno |
-| Importancia de variables | ✅ Mostrado (ranking con barras) | Ninguno |
+| Importancia de variables | ✅ Mostrado (ranking con barras, solo texto) | Complementar con el gráfico Matplotlib #8 (sección 14.1) |
 | Mejor modelo seleccionado | ✅ Mostrado (badge "Mejor modelo") | Ninguno |
 | Fecha del último entrenamiento | ✅ Mostrado | Ninguno |
 | Estado del modelo | ✅ Mostrado | Ninguno |
+| 9 gráficos Matplotlib (sección 14.1) | ❌ No existen — ni la lógica de generación ni la carpeta `media/charts/` | Implementar generación con Pandas + Matplotlib y mostrarlas como `<img>` en la vista |
 
-**Conclusión:** Modelo Predictivo es el módulo más completo funcionalmente. Solo falta el dato de **tiempo de entrenamiento** como ajuste visual menor (nueva card o dato dentro de una card existente, a definir sin alterar el layout general).
+**Conclusión:** Modelo Predictivo sigue siendo el módulo más completo en cuanto a métricas y flujo. Los dos pendientes reales son: (1) el dato de **tiempo de entrenamiento**, y (2) los **9 gráficos Matplotlib** — ambos documentados (secciones 14.1 y 17) pero **no implementados**.
 
 ### 21.3 Predicciones
 
@@ -622,11 +632,12 @@ Esta sección resume, módulo por módulo, los ajustes **funcionales** (no visua
 
 1. **La estructura de módulos ya está correctamente ordenada.** Los 5 módulos oficiales (Inicio, Dashboard, Dataset, Modelo Predictivo, Predicciones) existen, están activos en el sidebar, y Reportes/Registro de Pedidos ya están correctamente deshabilitados/fuera del flujo principal — no se requiere ningún cambio de navegación ni de rutas.
 2. **La separación de responsabilidades entre Dataset → Modelo Predictivo → Predicciones ya es conceptualmente correcta** tras el ajuste funcional de la fase anterior: Predicciones no entrena ni carga datos, Modelo Predictivo no carga dataset, Dataset no entrena ni predice.
-3. **Todo el contenido actual es demostrativo (mock data), no real.** No hay modelos de base de datos, no hay dependencias de ML instaladas, no hay archivos de dataset reales. Esto es coherente con el alcance de esta fase (documentar y validar, no construir).
-4. **El módulo con más brechas funcionales es Dataset** (validación real de estructura, columnas obligatorias, valores faltantes) seguido por el Centro de Recomendaciones de Predicciones (falta categorización).
-5. **El dataset objetivo definido en esta fase es sustancialmente más rico** que el dataset de demostración actual — el esquema formal de columnas obligatorias vs. opcionales ya quedó definido en la sección 12.8, listo para usarse como criterio de validación en cuanto llegue el archivo oficial.
+3. **Todo el contenido actual es demostrativo (mock data), no real.** No hay modelos de base de datos, no hay `pandas`/`matplotlib`/`scikit-learn` instalados, no hay archivos de dataset reales, no existe `media/charts/`. Esto es coherente con el alcance de esta fase (documentar y preparar, no construir ni generar datos).
+4. **El módulo Dataset ya está visualmente completo** según el esquema oficial (secciones 12.2/12.3): carga, estado vacío, 5 cards de resumen, columnas esperadas y vista previa. Su único pendiente real es de backend (Pandas + lógica de la sección 12.6), no de vista.
+5. **El esquema del dataset oficial (10 columnas obligatorias + 7 opcionales) ya quedó definido y es el mismo que usa la plantilla de Dataset** (secciones 12.2/12.3) — listo para usarse como criterio de validación real en cuanto llegue el archivo externo.
 6. **Ambos modelos (Regresión Lineal y Random Forest) son adecuados para el objetivo de negocio**: el primero aporta interpretabilidad y sirve de línea base; el segundo captura las relaciones no lineales típicas de la demanda gastronómica y aporta importancia de variables. La estrategia de selección automática por métricas es la correcta.
-7. **El dataset oficial será entregado externamente** (archivo CSV/XLSX) y no se genera en este proyecto ni en este documento. La siguiente fase técnica debe: (a) recibir ese archivo, (b) construir el validador de estructura del módulo Dataset contra la tabla de la sección 12.8, (c) resolver la decisión pendiente de `franja_horaria` (sección 12) antes de tocar las plantillas de Predicciones, y (d) diseñar el motor de reglas de negocio (sección 11) como una capa de servicio independiente (ej. dentro de `machine_learning/services/` o un nuevo módulo de reglas).
+7. **La arquitectura de visualización queda especificada, no implementada:** Pandas para el procesamiento y Matplotlib para los 9 gráficos oficiales (sección 14.1), guardados como imágenes en `media/charts/` y mostrados con `<img>` en las vistas — no como gráficos interactivos en el navegador.
+8. **El dataset oficial será entregado externamente** (archivo CSV/XLSX) y no se genera en este proyecto ni en este documento. La siguiente fase técnica debe: (a) recibir ese archivo, (b) construir el validador de estructura del módulo Dataset contra las tablas de las secciones 12.2/12.3 siguiendo la lógica de 12.6, (c) resolver la decisión pendiente de `franja_horaria` (sección 12) antes de tocar las plantillas de Predicciones, (d) implementar el entrenamiento real y la generación de gráficos (secciones 17 y 14.1), y (e) diseñar el motor de reglas de negocio (sección 11) como una capa de servicio independiente (ej. dentro de `machine_learning/services/` o un nuevo módulo de reglas).
 
 ---
 
@@ -634,33 +645,25 @@ Esta sección resume, módulo por módulo, los ajustes **funcionales** (no visua
 
 ### 23.1 ¿El dataset actual cumple con el flujo del sistema?
 
-**No.** El dataset mostrado en `templates/datasets/index.html` es una tabla de demostración con 3 filas de ejemplo escritas directamente en el HTML. No existe un archivo real cargado (`media/` está vacío), ni un modelo de base de datos que lo represente (`datasets/models.py` está vacío). Cumple su función *visual* (mostrar cómo se vería la vista previa), pero no cumple el flujo funcional completo de carga → validación → entrenamiento real.
+**Parcialmente, y solo en estructura visual.** Tras el último ajuste, `templates/datasets/index.html` ya usa exactamente las 10 columnas obligatorias oficiales (sección 12.2) en su vista previa, y lista las 7 opcionales (sección 12.3) en la sección "Columnas esperadas". Sin embargo, sigue siendo una demostración: las filas de la vista previa están escritas directamente en el HTML, no existe un archivo real cargado (`media/` está vacío), no existe un modelo de base de datos que lo represente (`datasets/models.py` está vacío), y la validación real de encabezados (sección 12.6) **no está implementada** — el JavaScript actual solo revisa la extensión del archivo. En síntesis: **la vista ya está lista para recibir el archivo oficial; el backend que lo procese todavía no existe.**
 
 ### 23.2 ¿Qué columnas faltan?
 
-Comparando el dataset objetivo (sección 12, ~29 variables) contra las 14 columnas actuales (`fecha, dia_semana, hora, franja_horaria, producto, categoria, cantidad, canal_pedido, promocion_activa, tipo_promocion, descuento, pedidos_dia_anterior, promedio_ultimos_7_dias, demanda`):
+Ya no hay columnas faltantes que definir — el esquema quedó cerrado en las secciones 12.2 (10 obligatorias) y 12.3 (7 opcionales), y la plantilla de Dataset ya lo refleja 1:1. Lo que falta es exclusivamente **backend**, no definición de columnas:
 
-**Presentes (parcial):** `fecha`, `dia_semana` (temporales); `producto`, `categoria`, `cantidad`, `canal_pedido` (≈ `canal_venta`), `promocion_activa`, `tipo_promocion`, `descuento` (comerciales); `pedidos_dia_anterior`, `promedio_ultimos_7_dias` (operativa/derivada); `demanda` (objetivo principal, aunque con nombre distinto al sugerido `pedidos_estimados`/`cantidad_pedidos`).
+- Implementar con Pandas la lectura real de encabezados del archivo importado.
+- Comparar esos encabezados contra las listas de 12.2/12.3 y aplicar la regla de rechazo/advertencia de la sección 12.6.
+- Calcular, a partir de las columnas importadas, las variables derivadas de la sección 12.4 (`dia_semana`, `mes`, `total_venta`, `pedidos_dia_anterior`, etc.) — estas **no se piden en el archivo**, se calculan.
 
-**Presentes pero con valores a reconciliar:** `franja_horaria` existe como columna en ambos, pero el mock actual usa valores tipo *Mañana/Mediodía/Noche* mientras que el dataset objetivo (sección 12.2) define oficialmente **Desayuno/Almuerzo/Cena**; y `hora` existe como columna suelta en el mock actual, pero el dataset objetivo la elimina como variable independiente (la granularidad pasa a ser por franja, no por hora exacta — ver nota de consistencia en sección 12). `cantidad` también sirve como base de la variable objetivo secundaria (`demanda_producto`), aunque todavía no está agregada como tal.
-
-**Faltantes por completo:**
-
-- Temporales: `mes`, `es_fin_semana`, `es_feriado`.
-- Comerciales: `precio_unitario`, `total_venta`.
-- Climáticas (las 3): `clima`, `temperatura`, `lluvia`.
-- Operativas: `personal_disponible`, `tiempo_preparacion_promedio`, `delivery_porcentaje`, `stock_disponible`.
-- Derivadas: `demanda_promedio_categoria`, `demanda_promedio_producto`, `nivel_demanda`, `nivel_operacion`.
-
-**Recomendación:** la clasificación obligatorias/opcionales ya no queda abierta — se formalizó en la **sección 12.8** (`fecha`, `dia_semana`, `franja_horaria`, `producto`, `categoria`, `cantidad`, `canal_venta`, `promocion_activa` y la variable objetivo agregada son obligatorias; el resto es opcional/enriquecimiento). El validador de estructura del módulo Dataset (sección 8.3 / 21.1) debe implementarse contra esa tabla cuando se reciba el archivo oficial. También conviene decidir y documentar la reconciliación de valores de `franja_horaria` (Mañana/Tarde/Noche, ya usado en la UI de Predicciones, vs. Desayuno/Almuerzo/Cena, definido como oficial en 12.2) antes de construir ese validador o de tocar las plantillas.
+**Pendiente de reconciliación (no es una columna faltante, es una decisión de diseño):** el módulo Predicciones usa las etiquetas **Mañana/Tarde/Noche** para sus "turnos", mientras que `franja_horaria` en el dataset oficial usa **Desayuno/Almuerzo/Cena** (sección 12.2). Antes de conectar Predicciones al modelo real entrenado con el dataset oficial, hay que decidir cuál de las dos rutas de la sección 12 se sigue (renombrar los turnos de Predicciones, o mantener una capa de traducción entre ambas).
 
 ### 23.3 ¿Regresión Lineal y Random Forest cumplen el objetivo del negocio?
 
-**Sí, en conjunto.** Ver detalle en sección 15. Regresión Lineal aporta interpretabilidad y una línea base contra la cual medir mejoras; Random Forest está mejor preparado para capturar las interacciones no lineales entre hora, día, producto, canal, clima y promociones que son típicas del negocio gastronómico. La estrategia de comparar ambos con MAE/RMSE/R² y elegir automáticamente el mejor (sección 15.3) es la correcta y ya está representada visualmente en Modelo Predictivo.
+**Sí, en conjunto.** Ver detalle en sección 15. Regresión Lineal aporta interpretabilidad y una línea base contra la cual medir mejoras; Random Forest está mejor preparado para capturar las interacciones no lineales entre franja horaria, producto, canal y promociones que son típicas del negocio gastronómico. La estrategia de comparar ambos con MAE/RMSE/R² y elegir automáticamente el mejor (sección 15.3) es la correcta y ya está representada visualmente en Modelo Predictivo.
 
 ### 23.4 ¿Qué debe mostrarse en Modelo Predictivo?
 
-Ver sección 8.4 y tabla 21.2. En síntesis, ya se muestra casi todo lo requerido (estado, R², comparación MAE/RMSE/R², variables e importancia, mejor modelo, último entrenamiento). Único faltante: **tiempo de entrenamiento** por modelo.
+Ver sección 8.4 y tabla 21.2. En síntesis, ya se muestra casi todo lo requerido a nivel de métricas y flujo (estado, R², comparación MAE/RMSE/R², variables e importancia en texto, mejor modelo, último entrenamiento). Faltan dos cosas, ambas ya especificadas pero no implementadas: **tiempo de entrenamiento** por modelo, y los **9 gráficos Matplotlib** de la sección 14.1 (demanda por franja, productos más vendidos, comparación MAE/RMSE/R², reales vs. predichos por modelo, importancia de variables y coeficientes), que deberán guardarse en `media/charts/` y mostrarse como imágenes en esta misma vista.
 
 ### 23.5 ¿Qué debe mostrarse en Predicciones?
 

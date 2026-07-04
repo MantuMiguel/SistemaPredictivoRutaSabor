@@ -46,6 +46,11 @@
     color: #B91C1C;
 }
 
+.upload-message--warning {
+    background-color: #FEF3C7;
+    color: #92400E;
+}
+
 /* ------------------------------------------------------------
    Modelo Predictivo: variables y placeholders de gráficos
    (pendiente de migrar a la nueva paleta roja en su propia fase)

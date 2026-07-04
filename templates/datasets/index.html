@@ -10,105 +10,138 @@
         Carga y valida el historial de ventas del restaurante para entrenar los modelos predictivos.
     </p>
 
-    <!-- Carga de archivo (.csv / .xlsx): validación solo de demostración en el navegador -->
-    <!-- AQUÍ LUEGO IRÁ LA LÓGICA DE PANDAS PARA LEER EL CSV/XLSX EN EL BACKEND. -->
+    <!-- Mensajes del servidor (éxito / advertencia / error de la última carga) -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="upload-message upload-message--{{ message.tags }} mb-4 text-sm font-medium rounded-xl px-4 py-3">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Carga de archivo (.csv / .xlsx): validación real en el backend con Pandas -->
     <div class="bg-white rounded-2xl shadow-sm p-6 mb-8">
         <h2 class="font-bold text-lg text-text-dark mb-1 text-center">Cargar dataset histórico</h2>
         <p class="text-xs text-muted mb-4 text-center">Formatos permitidos: .csv y .xlsx.</p>
 
-        <div class="flex flex-col md:flex-row items-center gap-4">
-            <label for="dataset-file"
-                   class="flex-1 w-full flex items-center gap-3 border-2 border-dashed border-orange-200 rounded-xl px-4 py-4 cursor-pointer hover:bg-orange-50/50 transition-colors">
-                <span class="material-symbols-outlined text-primary text-[26px]">upload_file</span>
-                <span class="flex flex-col min-w-0">
-                    <span id="dataset-file-name" class="text-sm font-medium text-text-dark truncate">Ningún archivo seleccionado</span>
-                    <span class="text-xs text-muted">Haz clic para elegir un archivo .csv o .xlsx</span>
-                </span>
-                <input type="file" id="dataset-file" accept=".csv,.xlsx" class="hidden">
-            </label>
+        <form method="post" enctype="multipart/form-data" action="{% url 'datasets:index' %}">
+            {% csrf_token %}
+            <div class="flex flex-col md:flex-row items-center gap-4">
+                <label for="dataset-file"
+                       class="flex-1 w-full flex items-center gap-3 border-2 border-dashed border-orange-200 rounded-xl px-4 py-4 cursor-pointer hover:bg-orange-50/50 transition-colors">
+                    <span class="material-symbols-outlined text-primary text-[26px]">upload_file</span>
+                    <span class="flex flex-col min-w-0">
+                        <span id="dataset-file-name" class="text-sm font-medium text-text-dark truncate">Ningún archivo seleccionado</span>
+                        <span class="text-xs text-muted">Haz clic para elegir un archivo .csv o .xlsx</span>
+                    </span>
+                    <input type="file" id="dataset-file" name="archivo" accept=".csv,.xlsx" class="hidden">
+                </label>
 
-            <button type="button" id="dataset-upload-btn"
-                    class="inline-flex items-center gap-2 bg-primary hover:bg-primary-dark text-white text-sm font-medium px-5 py-2.5 rounded-full transition-colors duration-200 shadow-sm shrink-0">
-                <span class="material-symbols-outlined text-[18px]">fact_check</span>
-                Validar dataset
-            </button>
-        </div>
-
-        <div id="dataset-upload-message" class="hidden mt-4 text-sm font-medium rounded-xl px-4 py-3"></div>
+                <button type="submit"
+                        class="inline-flex items-center gap-2 bg-primary hover:bg-primary-dark text-white text-sm font-medium px-5 py-2.5 rounded-full transition-colors duration-200 shadow-sm shrink-0">
+                    <span class="material-symbols-outlined text-[18px]">fact_check</span>
+                    Validar dataset
+                </button>
+            </div>
+        </form>
     </div>
 
-    <!-- Estado vacío: se muestra mientras no se haya validado ningún archivo -->
-    <div id="dataset-empty-state" class="bg-white rounded-2xl shadow-sm p-10 flex flex-col items-center text-center gap-3 mb-10">
-        <span class="w-14 h-14 rounded-full bg-primary/10 text-primary flex items-center justify-center">
-            <span class="material-symbols-outlined text-[28px]">database</span>
-        </span>
-        <h3 class="font-bold text-lg text-text-dark">Todavía no hay un dataset cargado</h3>
-        <p class="text-sm text-muted max-w-md">
-            Sube un archivo <strong>.csv</strong> o <strong>.xlsx</strong> con el historial de ventas y presiona
-            "Validar dataset" para ver aquí el resumen y la vista previa.
-        </p>
-    </div>
-
-    <!-- Resumen del dataset (valores de demostración, se muestra tras validar) -->
-    <div id="dataset-summary" class="hidden mb-10">
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-            <div class="bg-white rounded-2xl shadow-sm p-5 flex items-start justify-between gap-3 hover:shadow-md hover:-translate-y-0.5 transition-all">
-                <div class="flex flex-col gap-1 min-w-0">
-                    <span class="text-xs text-muted">Estado del dataset</span>
-                    <span class="text-2xl font-bold text-text-dark">Válido</span>
-                </div>
-                <span class="w-11 h-11 rounded-full bg-green-600 text-white flex items-center justify-center shrink-0">
-                    <span class="material-symbols-outlined text-[20px]">check_circle</span>
-                </span>
-            </div>
-            <div class="bg-white rounded-2xl shadow-sm p-5 flex items-start justify-between gap-3 hover:shadow-md hover:-translate-y-0.5 transition-all">
-                <div class="flex flex-col gap-1 min-w-0">
-                    <span class="text-xs text-muted">Registros detectados</span>
-                    <span class="text-2xl font-bold text-text-dark">7,240</span>
-                </div>
-                <span class="w-11 h-11 rounded-full bg-primary text-white flex items-center justify-center shrink-0">
-                    <span class="material-symbols-outlined text-[20px]">table_rows</span>
-                </span>
-            </div>
-            <div class="bg-white rounded-2xl shadow-sm p-5 flex items-start justify-between gap-3 hover:shadow-md hover:-translate-y-0.5 transition-all">
-                <div class="flex flex-col gap-1 min-w-0">
-                    <span class="text-xs text-muted">Columnas detectadas</span>
-                    <span class="text-2xl font-bold text-text-dark">14 / 17</span>
-                </div>
-                <span class="w-11 h-11 rounded-full bg-amber-600 text-white flex items-center justify-center shrink-0">
-                    <span class="material-symbols-outlined text-[20px]">view_column</span>
-                </span>
-            </div>
-            <div class="bg-white rounded-2xl shadow-sm p-5 flex items-start justify-between gap-3 hover:shadow-md hover:-translate-y-0.5 transition-all">
-                <div class="flex flex-col gap-1 min-w-0">
-                    <span class="text-xs text-muted">Periodo histórico</span>
-                    <span class="text-lg font-bold text-text-dark leading-tight">Ene 2025 - Jun 2026</span>
-                </div>
-                <span class="w-11 h-11 rounded-full bg-red-600 text-white flex items-center justify-center shrink-0">
-                    <span class="material-symbols-outlined text-[20px]">date_range</span>
-                </span>
-            </div>
-            <div class="bg-white rounded-2xl shadow-sm p-5 flex items-start justify-between gap-3 hover:shadow-md hover:-translate-y-0.5 transition-all">
-                <div class="flex flex-col gap-1 min-w-0">
-                    <span class="text-xs text-muted">Valores faltantes</span>
-                    <span class="text-2xl font-bold text-text-dark">0.4%</span>
-                </div>
-                <span class="w-11 h-11 rounded-full bg-stone-500 text-white flex items-center justify-center shrink-0">
-                    <span class="material-symbols-outlined text-[20px]">rule</span>
-                </span>
-            </div>
-        </div>
-
-        <!-- Advertencia por columnas opcionales faltantes (ejemplo de demostración) -->
-        <div class="alert-item alert-item--warning mt-4">
-            <span class="material-symbols-outlined text-[18px]">warning</span>
-            <span class="alert-item__desc">
-                Se detectaron las 10 columnas obligatorias. Faltan 3 columnas opcionales:
-                <strong>temperatura</strong>, <strong>lluvia</strong> y <strong>porcentaje_delivery</strong>.
-                No bloquean la validación, pero limitan el enriquecimiento del modelo.
+    {% if not dataset %}
+        <!-- Estado vacío: todavía no se ha cargado ningún archivo -->
+        <div class="bg-white rounded-2xl shadow-sm p-10 flex flex-col items-center text-center gap-3 mb-10">
+            <span class="w-14 h-14 rounded-full bg-primary/10 text-primary flex items-center justify-center">
+                <span class="material-symbols-outlined text-[28px]">database</span>
             </span>
+            <h3 class="font-bold text-lg text-text-dark">Todavía no hay un dataset cargado</h3>
+            <p class="text-sm text-muted max-w-md">
+                Sube un archivo <strong>.csv</strong> o <strong>.xlsx</strong> con el historial de ventas y presiona
+                "Validar dataset" para ver aquí el resumen y la vista previa.
+            </p>
         </div>
-    </div>
+    {% else %}
+        <!-- Estado del último dataset cargado -->
+        <p class="text-xs text-muted text-center mb-4">
+            Último archivo cargado: <strong class="text-text-dark">{{ dataset.nombre_original }}</strong>
+            &middot; {{ dataset.fecha_carga|date:"d/m/Y H:i" }}
+        </p>
+
+        <!-- Cards de resumen -->
+        <div class="mb-10">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                <div class="bg-white rounded-2xl shadow-sm p-5 flex items-start justify-between gap-3 hover:shadow-md hover:-translate-y-0.5 transition-all">
+                    <div class="flex flex-col gap-1 min-w-0">
+                        <span class="text-xs text-muted">Estado del dataset</span>
+                        <span class="text-2xl font-bold text-text-dark">{{ dataset.get_estado_validacion_display }}</span>
+                    </div>
+                    <span class="w-11 h-11 rounded-full flex items-center justify-center shrink-0 {% if dataset.estado_validacion == 'valido' %}bg-green-600{% else %}bg-red-600{% endif %} text-white">
+                        <span class="material-symbols-outlined text-[20px]">{% if dataset.estado_validacion == 'valido' %}check_circle{% else %}error{% endif %}</span>
+                    </span>
+                </div>
+                <div class="bg-white rounded-2xl shadow-sm p-5 flex items-start justify-between gap-3 hover:shadow-md hover:-translate-y-0.5 transition-all">
+                    <div class="flex flex-col gap-1 min-w-0">
+                        <span class="text-xs text-muted">Registros detectados</span>
+                        <span class="text-2xl font-bold text-text-dark">{{ dataset.cantidad_registros }}</span>
+                    </div>
+                    <span class="w-11 h-11 rounded-full bg-primary text-white flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-[20px]">table_rows</span>
+                    </span>
+                </div>
+                <div class="bg-white rounded-2xl shadow-sm p-5 flex items-start justify-between gap-3 hover:shadow-md hover:-translate-y-0.5 transition-all">
+                    <div class="flex flex-col gap-1 min-w-0">
+                        <span class="text-xs text-muted">Columnas detectadas</span>
+                        <span class="text-2xl font-bold text-text-dark">{{ dataset.cantidad_columnas }}</span>
+                        <span class="text-xs text-muted">{{ columnas_esquema_ok }} / {{ columnas_esquema_total }} del esquema</span>
+                    </div>
+                    <span class="w-11 h-11 rounded-full bg-amber-600 text-white flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-[20px]">view_column</span>
+                    </span>
+                </div>
+                <div class="bg-white rounded-2xl shadow-sm p-5 flex items-start justify-between gap-3 hover:shadow-md hover:-translate-y-0.5 transition-all">
+                    <div class="flex flex-col gap-1 min-w-0">
+                        <span class="text-xs text-muted">Periodo histórico</span>
+                        {% if dataset.periodo_inicio and dataset.periodo_fin %}
+                            <span class="text-lg font-bold text-text-dark leading-tight">{{ dataset.periodo_inicio|date:"M Y" }} - {{ dataset.periodo_fin|date:"M Y" }}</span>
+                        {% else %}
+                            <span class="text-lg font-bold text-text-dark leading-tight">Sin datos</span>
+                        {% endif %}
+                    </div>
+                    <span class="w-11 h-11 rounded-full bg-red-600 text-white flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-[20px]">date_range</span>
+                    </span>
+                </div>
+                <div class="bg-white rounded-2xl shadow-sm p-5 flex items-start justify-between gap-3 hover:shadow-md hover:-translate-y-0.5 transition-all">
+                    <div class="flex flex-col gap-1 min-w-0">
+                        <span class="text-xs text-muted">Valores faltantes</span>
+                        <span class="text-2xl font-bold text-text-dark">{{ dataset.valores_faltantes.porcentaje }}%</span>
+                        <span class="text-xs text-muted">{{ dataset.valores_faltantes.total_celdas_vacias }} celdas vacías</span>
+                    </div>
+                    <span class="w-11 h-11 rounded-full bg-stone-500 text-white flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-[20px]">rule</span>
+                    </span>
+                </div>
+            </div>
+
+            <!-- Errores por columnas obligatorias faltantes -->
+            {% if dataset.errores_validacion %}
+                {% for error in dataset.errores_validacion %}
+                    <div class="alert-item alert-item--danger mt-4">
+                        <span class="material-symbols-outlined text-[18px]">error</span>
+                        <span class="alert-item__desc">{{ error }}</span>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <!-- Advertencias por columnas opcionales faltantes -->
+            {% if dataset.advertencias %}
+                {% for advertencia in dataset.advertencias %}
+                    <div class="alert-item alert-item--warning mt-4">
+                        <span class="material-symbols-outlined text-[18px]">warning</span>
+                        <span class="alert-item__desc">{{ advertencia }} No bloquean la validación, pero limitan el enriquecimiento del modelo.</span>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+    {% endif %}
 
     <!-- Columnas esperadas del dataset (referencia siempre visible) -->
     <div class="mb-10">
@@ -123,16 +156,9 @@
                 </h3>
                 <p class="text-xs text-muted text-center mb-3">Si faltan, el archivo se rechaza.</p>
                 <div class="flex flex-wrap gap-2 justify-center">
-                    <span class="variable-chip">fecha</span>
-                    <span class="variable-chip">franja_horaria</span>
-                    <span class="variable-chip">producto</span>
-                    <span class="variable-chip">categoria</span>
-                    <span class="variable-chip">cantidad_vendida</span>
-                    <span class="variable-chip">canal_venta</span>
-                    <span class="variable-chip">promocion_activa</span>
-                    <span class="variable-chip">tipo_promocion</span>
-                    <span class="variable-chip">descuento_pct</span>
-                    <span class="variable-chip">precio_unitario</span>
+                    {% for col in columnas_obligatorias %}
+                        <span class="variable-chip{% if dataset and col in dataset.columnas_faltantes %} ring-2 ring-red-400 text-red-600{% endif %}">{{ col }}</span>
+                    {% endfor %}
                 </div>
             </div>
 
@@ -143,86 +169,47 @@
                 </h3>
                 <p class="text-xs text-muted text-center mb-3">Enriquecen el modelo, pero no bloquean la carga si faltan.</p>
                 <div class="flex flex-wrap gap-2 justify-center">
-                    <span class="variable-chip">clima</span>
-                    <span class="variable-chip">temperatura</span>
-                    <span class="variable-chip">lluvia</span>
-                    <span class="variable-chip">personal_disponible</span>
-                    <span class="variable-chip">tiempo_preparacion_min</span>
-                    <span class="variable-chip">stock_disponible</span>
-                    <span class="variable-chip">porcentaje_delivery</span>
+                    {% for col in columnas_opcionales %}
+                        <span class="variable-chip{% if dataset and col in dataset.columnas_opcionales_faltantes %} ring-2 ring-amber-400 text-amber-600{% endif %}">{{ col }}</span>
+                    {% endfor %}
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Vista previa de datos (se muestra tras validar). Las filas son de ejemplo. -->
-    <div id="dataset-preview" class="hidden">
-        <h2 class="font-bold text-lg text-text-dark mb-1 text-center">Vista previa de datos</h2>
-        <p class="text-xs text-muted mb-4 text-center">Primeras filas del dataset cargado (columnas obligatorias).</p>
+    {% if dataset and dataset.columnas_detectadas %}
+        <!-- Vista previa de datos: primeras 10 filas del archivo realmente cargado -->
+        <div>
+            <h2 class="font-bold text-lg text-text-dark mb-1 text-center">Vista previa de datos</h2>
+            <p class="text-xs text-muted mb-4 text-center">Primeras {{ dataset.vista_previa|length }} filas de "{{ dataset.nombre_original }}".</p>
 
-        <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
-            <div class="overflow-x-auto">
-                <table class="w-full text-left text-sm whitespace-nowrap">
-                    <thead class="bg-stone-50">
-                        <tr>
-                            <th class="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-stone-500">fecha</th>
-                            <th class="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-stone-500">franja_horaria</th>
-                            <th class="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-stone-500">producto</th>
-                            <th class="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-stone-500">categoria</th>
-                            <th class="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-primary-dark text-right bg-orange-50/60">cantidad_vendida</th>
-                            <th class="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-stone-500">canal_venta</th>
-                            <th class="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-stone-500 text-center">promocion_activa</th>
-                            <th class="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-stone-500">tipo_promocion</th>
-                            <th class="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-stone-500 text-right">descuento_pct</th>
-                            <th class="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-stone-500 text-right">precio_unitario</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-stone-100">
-                        <!-- Filas de ejemplo, coherentes con el catálogo de Ruta del Sabor -->
-                        <tr class="hover:bg-orange-50/40 transition-colors">
-                            <td class="px-4 py-3 text-stone-500">2026-01-15</td>
-                            <td class="px-4 py-3">Almuerzo</td>
-                            <td class="px-4 py-3 font-medium text-text-dark">Hamburguesa Clásica</td>
-                            <td class="px-4 py-3 text-stone-500">Hamburguesas</td>
-                            <td class="px-4 py-3 text-right font-bold text-primary-dark bg-orange-50/60">8</td>
-                            <td class="px-4 py-3 text-stone-500">Local</td>
-                            <td class="px-4 py-3 text-center"><span class="table-pill table-pill--yes">Sí</span></td>
-                            <td class="px-4 py-3 text-stone-500">Combo</td>
-                            <td class="px-4 py-3 text-right text-primary-dark">10%</td>
-                            <td class="px-4 py-3 text-right">S/ 15.90</td>
-                        </tr>
-                        <tr class="hover:bg-orange-50/40 transition-colors">
-                            <td class="px-4 py-3 text-stone-500">2026-01-15</td>
-                            <td class="px-4 py-3">Cena</td>
-                            <td class="px-4 py-3 font-medium text-text-dark">Pollo Broaster</td>
-                            <td class="px-4 py-3 text-stone-500">Pollo</td>
-                            <td class="px-4 py-3 text-right font-bold text-primary-dark bg-orange-50/60">5</td>
-                            <td class="px-4 py-3 text-stone-500">Delivery</td>
-                            <td class="px-4 py-3 text-center"><span class="table-pill table-pill--no">No</span></td>
-                            <td class="px-4 py-3 text-stone-500">&mdash;</td>
-                            <td class="px-4 py-3 text-right text-stone-500">0%</td>
-                            <td class="px-4 py-3 text-right">S/ 22.50</td>
-                        </tr>
-                        <tr class="hover:bg-orange-50/40 transition-colors">
-                            <td class="px-4 py-3 text-stone-500">2026-01-16</td>
-                            <td class="px-4 py-3">Desayuno</td>
-                            <td class="px-4 py-3 font-medium text-text-dark">Jugo Natural</td>
-                            <td class="px-4 py-3 text-stone-500">Bebidas</td>
-                            <td class="px-4 py-3 text-right font-bold text-primary-dark bg-orange-50/60">12</td>
-                            <td class="px-4 py-3 text-stone-500">Local</td>
-                            <td class="px-4 py-3 text-center"><span class="table-pill table-pill--no">No</span></td>
-                            <td class="px-4 py-3 text-stone-500">&mdash;</td>
-                            <td class="px-4 py-3 text-right text-stone-500">0%</td>
-                            <td class="px-4 py-3 text-right">S/ 6.50</td>
-                        </tr>
-                    </tbody>
-                </table>
+            <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm whitespace-nowrap">
+                        <thead class="bg-stone-50">
+                            <tr>
+                                {% for col in dataset.columnas_detectadas %}
+                                    <th class="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-stone-500">{{ col }}</th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-stone-100">
+                            {% for fila in dataset.vista_previa %}
+                                <tr class="hover:bg-orange-50/40 transition-colors">
+                                    {% for valor in fila %}
+                                        <td class="px-4 py-3 text-stone-500">{{ valor }}</td>
+                                    {% endfor %}
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
+            <p class="text-xs text-muted mt-3 text-center">
+                Vista previa del archivo real cargado ({{ dataset.cantidad_registros }} registros en total).
+            </p>
         </div>
-        <p class="text-xs text-muted mt-3 text-center">
-            Vista previa con datos de ejemplo. Al cargar un archivo real, esta tabla se completará automáticamente.
-        </p>
-    </div>
+    {% endif %}
 
 {% endblock %}
 
