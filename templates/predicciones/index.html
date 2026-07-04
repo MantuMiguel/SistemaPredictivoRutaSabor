@@ -62,49 +62,60 @@
         <p class="text-xs text-gray-500 mb-4 text-center">Elige el rango y las condiciones para estimar la demanda futura.</p>
 
         <div class="bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-200 border border-gray-100 p-6">
-            <form class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                    <label class="block text-xs font-medium text-gray-500 mb-1.5">Fecha a consultar</label>
-                    <input type="date"
-                           class="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-200 focus:border-red-400 placeholder:text-gray-400">
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-gray-500 mb-1.5">Rango de predicción</label>
-                    <select class="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-200 focus:border-red-400">
-                        <option>Hoy</option>
-                        <option>Mañana</option>
-                        <option>Próximos 7 días</option>
-                        <option>Fecha personalizada</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-gray-500 mb-1.5">Franja horaria</label>
-                    <select class="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-200 focus:border-red-400">
-                        <option>Todo el día</option>
-                        <option>Mañana</option>
-                        <option>Tarde</option>
-                        <option>Noche</option>
-                    </select>
-                </div>
-
-                <div>
-                    <label class="block text-xs font-medium text-gray-500 mb-1.5">Promoción planificada</label>
-                    <select class="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-200 focus:border-red-400">
-                        <option>No</option>
-                        <option>Sí</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-gray-500 mb-1.5">Tipo de promoción</label>
-                    <select class="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-200 focus:border-red-400">
-                        <option>Ninguna</option>
-                        <option>Combo</option>
-                        <option>2x1</option>
-                        <option>Descuento</option>
-                    </select>
+            <form class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-xs font-medium text-gray-500 mb-1.5">Fecha a consultar</label>
+                        <input type="date"
+                               class="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-200 focus:border-red-400 placeholder:text-gray-400">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-500 mb-1.5">Rango de predicción</label>
+                        <select class="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-200 focus:border-red-400">
+                            <option>Hoy</option>
+                            <option>Mañana</option>
+                            <option>Próximos 7 días</option>
+                            <option>Fecha personalizada</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-500 mb-1.5">Franja horaria</label>
+                        <select class="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-200 focus:border-red-400">
+                            <option>Todo el día</option>
+                            <option>Mañana</option>
+                            <option>Tarde</option>
+                            <option>Noche</option>
+                        </select>
+                    </div>
                 </div>
 
-                <div class="md:col-span-3 pt-2 flex justify-center">
+                <!-- Opciones avanzadas de simulación: secundarias, colapsadas por defecto -->
+                <details class="group border-t border-gray-100 pt-4">
+                    <summary class="cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden flex items-center gap-1.5 text-xs font-medium text-gray-500 hover:text-gray-700">
+                        <span class="material-symbols-outlined text-[16px] transition-transform duration-200 group-open:rotate-90">chevron_right</span>
+                        Opciones avanzadas de simulación
+                    </summary>
+                    <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 mb-1.5">Simular promoción</label>
+                            <select class="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-200 focus:border-red-400">
+                                <option>No</option>
+                                <option>Sí</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 mb-1.5">Tipo de promoción</label>
+                            <select class="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-200 focus:border-red-400">
+                                <option>Ninguna</option>
+                                <option>Combo</option>
+                                <option>2x1</option>
+                                <option>Descuento</option>
+                            </select>
+                        </div>
+                    </div>
+                </details>
+
+                <div class="flex justify-center pt-2">
                     <!-- Sin acción real todavía: el botón no envía datos al backend -->
                     <!-- AQUÍ LUEGO SE CONECTARÁ CON EL MODELO ENTRENADO PARA CALCULAR LA DEMANDA REAL. -->
                     <button type="button" disabled
@@ -139,6 +150,117 @@
                 <div>
                     <span class="text-xs text-gray-500 block">Recomendación para cocina</span>
                     <span class="text-sm font-semibold text-text-dark">Reforzar personal y stock entre 7 p.m. y 9 p.m.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Predicción por turnos (valores de demostración) -->
+    <!-- AQUÍ LUEGO SE CALCULARÁ LA PREDICCIÓN REAL POR TURNO DESDE EL MODELO ENTRENADO. -->
+    <div class="mt-10">
+        <h2 class="font-bold text-lg text-text-dark mb-1 text-center">Predicción por turnos</h2>
+        <p class="text-xs text-gray-500 mb-4 text-center">Resumen de la demanda esperada en cada turno del rango consultado.</p>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <!-- Turno mañana -->
+            <div class="bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-200 border border-gray-100 p-5 flex flex-col gap-4">
+                <div class="flex items-center gap-3">
+                    <span class="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600 shrink-0">
+                        <span class="material-symbols-outlined text-[20px]">wb_sunny</span>
+                    </span>
+                    <div>
+                        <span class="block text-sm font-bold text-text-dark">Turno mañana</span>
+                        <span class="block text-xs text-gray-500">08:00 - 12:00</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3 pt-3 border-t border-gray-100">
+                    <div>
+                        <span class="block text-[11px] text-gray-500">Pedidos estimados</span>
+                        <span class="block text-lg font-bold text-text-dark">38</span>
+                    </div>
+                    <div>
+                        <span class="block text-[11px] text-gray-500">Pico de demanda</span>
+                        <span class="block text-sm font-semibold text-text-dark">11:00 - 12:00</span>
+                    </div>
+                </div>
+
+                <div>
+                    <span class="block text-[11px] text-gray-500">Producto destacado</span>
+                    <span class="block text-sm font-semibold text-text-dark">Café + Sándwich</span>
+                </div>
+
+                <div class="flex items-start gap-2 bg-gray-50 rounded-xl p-3">
+                    <span class="material-symbols-outlined text-[16px] text-amber-600 mt-0.5">lightbulb</span>
+                    <span class="text-xs text-gray-600">Preparar insumos ligeros y bebidas.</span>
+                </div>
+            </div>
+
+            <!-- Turno tarde -->
+            <div class="bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-200 border border-gray-100 p-5 flex flex-col gap-4">
+                <div class="flex items-center gap-3">
+                    <span class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 shrink-0">
+                        <span class="material-symbols-outlined text-[20px]">lunch_dining</span>
+                    </span>
+                    <div>
+                        <span class="block text-sm font-bold text-text-dark">Turno tarde</span>
+                        <span class="block text-xs text-gray-500">12:00 - 18:00</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3 pt-3 border-t border-gray-100">
+                    <div>
+                        <span class="block text-[11px] text-gray-500">Pedidos estimados</span>
+                        <span class="block text-lg font-bold text-text-dark">76</span>
+                    </div>
+                    <div>
+                        <span class="block text-[11px] text-gray-500">Pico de demanda</span>
+                        <span class="block text-sm font-semibold text-text-dark">13:00 - 14:00</span>
+                    </div>
+                </div>
+
+                <div>
+                    <span class="block text-[11px] text-gray-500">Producto destacado</span>
+                    <span class="block text-sm font-semibold text-text-dark">Menú ejecutivo</span>
+                </div>
+
+                <div class="flex items-start gap-2 bg-gray-50 rounded-xl p-3">
+                    <span class="material-symbols-outlined text-[16px] text-blue-600 mt-0.5">lightbulb</span>
+                    <span class="text-xs text-gray-600">Reforzar cocina durante hora de almuerzo.</span>
+                </div>
+            </div>
+
+            <!-- Turno noche -->
+            <div class="bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-200 border border-gray-100 p-5 flex flex-col gap-4">
+                <div class="flex items-center gap-3">
+                    <span class="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center text-red-600 shrink-0">
+                        <span class="material-symbols-outlined text-[20px]">bedtime</span>
+                    </span>
+                    <div>
+                        <span class="block text-sm font-bold text-text-dark">Turno noche</span>
+                        <span class="block text-xs text-gray-500">18:00 - 22:00</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3 pt-3 border-t border-gray-100">
+                    <div>
+                        <span class="block text-[11px] text-gray-500">Pedidos estimados</span>
+                        <span class="block text-lg font-bold text-text-dark">112</span>
+                    </div>
+                    <div>
+                        <span class="block text-[11px] text-gray-500">Pico de demanda</span>
+                        <span class="block text-sm font-semibold text-text-dark">19:00 - 21:00</span>
+                    </div>
+                </div>
+
+                <div>
+                    <span class="block text-[11px] text-gray-500">Producto destacado</span>
+                    <span class="block text-sm font-semibold text-text-dark">Hamburguesa Clásica</span>
+                </div>
+
+                <div class="flex items-start gap-2 bg-red-50 rounded-xl p-3">
+                    <span class="material-symbols-outlined text-[16px] text-red-600 mt-0.5">lightbulb</span>
+                    <span class="text-xs text-gray-600">Coordinar delivery y aumentar preparación previa.</span>
                 </div>
             </div>
         </div>
