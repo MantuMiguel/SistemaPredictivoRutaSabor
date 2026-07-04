@@ -2,99 +2,12 @@
    Ruta del Sabor - estilos propios
    Tailwind CSS (CDN) da las utilidades; aquí solo va lo que
    Tailwind no resuelve por clases: el ajuste de Material Symbols,
-   el gráfico de barras por horas y las alertas, hechos solo con
-   HTML + CSS (sin librerías de gráficos).
+   el gráfico de barras por horas y algunos componentes hechos
+   solo con HTML + CSS (sin librerías de gráficos).
    ============================================================ */
 
 .material-symbols-outlined {
     font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-}
-
-.text-muted {
-    color: #78716C;
-}
-
-/* ------------------------------------------------------------
-   Sidebar: enlaces de navegación entre módulos
-   ------------------------------------------------------------ */
-
-.sidebar-link {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 0.62rem 0.75rem;
-    border-radius: 0.7rem;
-    font-size: 0.875rem;
-    line-height: 1.2;
-    transition: background-color .18s ease, color .18s ease, transform .18s ease;
-}
-
-/* Módulo activo: fondo cálido, borde redondeado y buen contraste de texto */
-.sidebar-link--active {
-    background-color: #FFEDD5;
-    color: #9A3412;
-    font-weight: 600;
-    box-shadow: inset 0 0 0 1px rgba(234, 88, 12, .18);
-}
-
-/* Módulos disponibles pero no activos: hover suave */
-.sidebar-link--idle {
-    color: #57534E;
-    text-decoration: none;
-}
-
-.sidebar-link--idle:hover {
-    background-color: #FFF7ED;
-    color: #C2410C;
-    transform: translateX(2px);
-}
-
-/* Módulos todavía no disponibles: claramente diferenciados, sin interacción */
-.sidebar-link--disabled {
-    color: #D6D3D1;
-    background-color: transparent;
-    cursor: not-allowed;
-}
-
-.sidebar-badge-soon {
-    margin-left: auto;
-    font-size: 0.62rem;
-    font-weight: 600;
-    letter-spacing: 0.03em;
-    text-transform: uppercase;
-    background-color: #F5F5F4;
-    color: #A8A29E;
-    padding: 0.2rem 0.55rem;
-    border-radius: 999px;
-}
-
-/* ------------------------------------------------------------
-   Formularios (Predicciones, Dataset, Modelo Predictivo)
-   ------------------------------------------------------------ */
-
-.field-label {
-    display: block;
-    font-size: 0.8rem;
-    font-weight: 500;
-    color: #57534E;
-    margin-bottom: 0.35rem;
-}
-
-.field-input {
-    width: 100%;
-    border: 1px solid #E7E5E4;
-    border-radius: 0.6rem;
-    padding: 0.55rem 0.75rem;
-    font-size: 0.875rem;
-    color: #431407;
-    background-color: #ffffff;
-    transition: border-color .15s ease, box-shadow .15s ease;
-}
-
-.field-input:focus {
-    outline: none;
-    border-color: #EA580C;
-    box-shadow: 0 0 0 3px rgba(234, 88, 12, .15);
 }
 
 /* ------------------------------------------------------------
@@ -120,7 +33,22 @@
 }
 
 /* ------------------------------------------------------------
+   Mensajes de carga (Dataset Histórico)
+   ------------------------------------------------------------ */
+
+.upload-message--success {
+    background-color: #DCFCE7;
+    color: #15803D;
+}
+
+.upload-message--error {
+    background-color: #FEE2E2;
+    color: #B91C1C;
+}
+
+/* ------------------------------------------------------------
    Modelo Predictivo: variables y placeholders de gráficos
+   (pendiente de migrar a la nueva paleta roja en su propia fase)
    ------------------------------------------------------------ */
 
 .variable-chip {
@@ -134,18 +62,24 @@
     border-radius: 999px;
 }
 
-.chart-placeholder {
-    height: 220px;
-    border: 2px dashed #FDBA74;
-    border-radius: 1rem;
-    background-color: #ffffff;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    color: #9A3412;
+.flow-badge {
+    background-color: #FFEDD5;
+    color: #C2410C;
+    padding: 0.5rem 1.1rem;
+    border-radius: 999px;
     font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.flow-badge--active {
+    background-color: #EA580C;
+    color: #ffffff;
+}
+
+.flow-arrow {
+    color: #C2410C;
+    font-weight: 700;
+    opacity: 0.6;
 }
 
 /* ------------------------------------------------------------
@@ -173,7 +107,7 @@
     width: 100%;
     max-width: 34px;
     margin: 0 auto;
-    background: linear-gradient(180deg, #FDBA74, #EA580C);
+    background: linear-gradient(180deg, #F8C9C9, #F3A8A8);
     border-radius: 0.5rem 0.5rem 0.25rem 0.25rem;
     position: relative;
     transition: height .3s ease;
@@ -187,22 +121,22 @@
     text-align: center;
     font-size: 0.7rem;
     font-weight: 600;
-    color: #431407;
+    color: #1F2430;
 }
 
 .hour-bar__label {
     margin-top: 0.5rem;
     font-size: 0.75rem;
-    color: #78716C;
+    color: #6B7280;
 }
 
 /* Horas críticas (mayor acumulación de pedidos) */
 .hour-bar--critica .hour-bar__fill {
-    background: linear-gradient(180deg, #FCA5A5, #DC2626);
+    background: linear-gradient(180deg, #C81E2C, #7A1019);
 }
 
 .hour-bar--critica .hour-bar__label {
-    color: #B91C1C;
+    color: #9A1520;
     font-weight: 600;
 }
 
@@ -213,11 +147,12 @@
     border-radius: 50%;
 }
 
-.legend-dot--normal { background-color: #EA580C; }
-.legend-dot--critica { background-color: #DC2626; }
+.legend-dot--normal { background-color: #F3A8A8; }
+.legend-dot--critica { background-color: #C81E2C; }
 
 /* ------------------------------------------------------------
-   Productos con mayor demanda (lista con barra de progreso)
+   Productos con mayor demanda / variables más importantes
+   (lista con barra de progreso)
    ------------------------------------------------------------ */
 
 .product-row {
@@ -225,7 +160,7 @@
     align-items: center;
     gap: 1rem;
     padding: 0.75rem 0;
-    border-bottom: 1px solid #f1efed;
+    border-bottom: 1px solid #F3F4F6;
 }
 
 .product-row:last-child {
@@ -243,9 +178,9 @@
 .product-row__icon {
     width: 34px;
     height: 34px;
-    border-radius: 50%;
-    background-color: #FFF1E6;
-    color: #C2410C;
+    border-radius: 0.65rem;
+    background-color: #FDF2F2;
+    color: #C81E2C;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -254,21 +189,21 @@
 
 .product-row__name {
     font-size: 0.9rem;
-    color: #431407;
+    color: #1F2430;
     font-weight: 500;
 }
 
 .product-row__bar {
     flex: 1 1 auto;
     height: 8px;
-    background-color: #f1efed;
+    background-color: #F3F4F6;
     border-radius: 999px;
     overflow: hidden;
 }
 
 .product-row__bar-fill {
     height: 100%;
-    background: linear-gradient(90deg, #EA580C, #C2410C);
+    background: linear-gradient(90deg, #C81E2C, #9A1520);
     border-radius: 999px;
 }
 
@@ -277,7 +212,7 @@
     text-align: right;
     font-size: 0.85rem;
     font-weight: 600;
-    color: #431407;
+    color: #1F2430;
     flex-shrink: 0;
 }
 
@@ -307,17 +242,20 @@
 }
 
 .alert-item__desc {
-    color: #431407;
+    color: #1F2430;
 }
 
+/* Crítico/error */
 .alert-item--danger { background-color: #FEE2E2; }
 .alert-item--danger .material-symbols-outlined { color: #DC2626; }
 
+/* Advertencia */
 .alert-item--warning { background-color: #FEF3C7; }
 .alert-item--warning .material-symbols-outlined { color: #D97706; }
 
-.alert-item--info { background-color: #FFEDD5; }
-.alert-item--info .material-symbols-outlined { color: #EA580C; }
+/* Informativo */
+.alert-item--info { background-color: #DBEAFE; }
+.alert-item--info .material-symbols-outlined { color: #2563EB; }
 
 /* ------------------------------------------------------------
    Recomendaciones para cocina
@@ -332,11 +270,11 @@
 .recommend-list li {
     display: flex;
     align-items: center;
-    gap: 0.65rem;
+    gap: 0.75rem;
     padding: 0.6rem 0;
-    border-bottom: 1px solid #f1efed;
+    border-bottom: 1px solid #F3F4F6;
     font-size: 0.88rem;
-    color: #431407;
+    color: #1F2430;
 }
 
 .recommend-list li:last-child {
@@ -345,4 +283,15 @@
 
 .recommend-list .material-symbols-outlined {
     color: #16A34A;
+}
+
+.recommend-list__icon {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 0.65rem;
+    background-color: #DCFCE7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
 }

@@ -6,18 +6,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Ruta del Sabor{% endblock %}</title>
 
-    <!-- Tailwind CSS vía CDN: el diseño de referencia (Stitch) depende de sus clases utilitarias -->
+    <!-- Tailwind CSS vía CDN -->
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script id="tailwind-config">
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        background: '#FFF7ED',
-                        primary: '#EA580C',
-                        'primary-dark': '#C2410C',
-                        'text-dark': '#431407',
-                        muted: '#78716C',
+                        // Rojo de marca: sobrescribe la escala "red" de Tailwind para que
+                        // bg-red-600 / hover:bg-red-700 / active:bg-red-800, etc. usen
+                        // directamente la paleta de la guía visual.
+                        red: {
+                            50: '#FDF2F2',
+                            100: '#FCE4E4',
+                            200: '#F8C9C9',
+                            300: '#F3A8A8',
+                            600: '#C81E2C',
+                            700: '#9A1520',
+                            800: '#7A1019',
+                        },
+                        // Alias de compatibilidad: lo siguen usando Dataset Histórico y
+                        // Modelo Predictivo (todavía no migrados a clases Tailwind directas).
+                        primary: '#C81E2C',
+                        'primary-dark': '#9A1520',
+                        'text-dark': '#1F2430',
+                        muted: '#6B7280',
                     },
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
@@ -33,68 +46,78 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
 
-    <!-- CSS propio del proyecto: solo lo que Tailwind no cubre (iconos, animaciones, barras del gráfico) -->
+    <!-- CSS propio del proyecto: solo lo que Tailwind no cubre (Material Symbols, gráfico de barras, alertas) -->
     <link href="{% static 'css/styles.css' %}" rel="stylesheet">
 </head>
-<body class="bg-background text-text-dark font-sans min-h-screen">
+<body class="bg-gray-100 text-text-dark font-sans min-h-screen">
 
     <div class="md:flex md:min-h-screen">
 
         <!-- Sidebar: marca + navegación entre módulos -->
-        <nav class="hidden md:flex md:flex-col md:w-[268px] md:shrink-0 bg-white border-r border-black/5 py-6 px-4">
+        <nav class="hidden md:flex md:flex-col md:w-[268px] md:shrink-0 bg-white border-r border-gray-100 py-6 px-4">
             <div class="flex items-center gap-3 px-2 mb-7">
-                <span class="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-primary-dark text-white flex items-center justify-center font-bold text-sm shrink-0">RS</span>
+                <span class="w-10 h-10 rounded-full bg-gradient-to-br from-red-600 to-red-700 text-white flex items-center justify-center font-bold text-sm shrink-0">RS</span>
                 <div>
                     <div class="font-bold text-text-dark leading-tight">Ruta del Sabor</div>
-                    <div class="text-xs text-primary-dark">Sistema predictivo</div>
+                    <div class="text-xs text-red-600">Sistema predictivo</div>
                 </div>
             </div>
 
             <ul class="flex flex-col gap-1">
                 <li>
-                    <a href="{% url 'dashboard:inicio' %}" class="sidebar-link {% if modulo_activo == 'inicio' %}sidebar-link--active{% else %}sidebar-link--idle{% endif %}">
+                    <a href="{% url 'dashboard:inicio' %}"
+                       class="flex items-center gap-3 px-3 py-2.5 text-sm transition-colors
+                              {% if modulo_activo == 'inicio' %}bg-red-600 text-white rounded-xl font-semibold shadow-sm{% else %}text-gray-500 rounded-xl hover:bg-gray-50 hover:text-gray-700{% endif %}">
                         <span class="material-symbols-outlined text-[20px]">home</span>
                         <span>Inicio</span>
                     </a>
                 </li>
                 <li>
-                    <a href="{% url 'dashboard:index' %}" class="sidebar-link {% if modulo_activo == 'dashboard' %}sidebar-link--active{% else %}sidebar-link--idle{% endif %}">
+                    <a href="{% url 'dashboard:index' %}"
+                       class="flex items-center gap-3 px-3 py-2.5 text-sm transition-colors
+                              {% if modulo_activo == 'dashboard' %}bg-red-600 text-white rounded-xl font-semibold shadow-sm{% else %}text-gray-500 rounded-xl hover:bg-gray-50 hover:text-gray-700{% endif %}">
                         <span class="material-symbols-outlined text-[20px]">dashboard</span>
                         <span>Panel de Control</span>
                     </a>
                 </li>
                 <li>
                     <!-- Todavía no existe la ruta: se deja como enlace visual deshabilitado -->
-                    <span class="sidebar-link sidebar-link--disabled">
+                    <span class="flex items-center gap-3 px-3 py-2.5 text-sm text-gray-300 cursor-not-allowed">
                         <span class="material-symbols-outlined text-[20px]">receipt_long</span>
                         <span>Registro de Pedidos</span>
-                        <span class="sidebar-badge-soon">Próximamente</span>
+                        <span class="ml-auto inline-flex items-center bg-gray-100 text-gray-400 rounded-full text-xs px-2 py-1">Próximamente</span>
                     </span>
                 </li>
                 <li>
-                    <a href="{% url 'datasets:index' %}" class="sidebar-link {% if modulo_activo == 'datasets' %}sidebar-link--active{% else %}sidebar-link--idle{% endif %}">
+                    <a href="{% url 'datasets:index' %}"
+                       class="flex items-center gap-3 px-3 py-2.5 text-sm transition-colors
+                              {% if modulo_activo == 'datasets' %}bg-red-600 text-white rounded-xl font-semibold shadow-sm{% else %}text-gray-500 rounded-xl hover:bg-gray-50 hover:text-gray-700{% endif %}">
                         <span class="material-symbols-outlined text-[20px]">database</span>
                         <span>Dataset Histórico</span>
                     </a>
                 </li>
                 <li>
-                    <a href="{% url 'machine_learning:index' %}" class="sidebar-link {% if modulo_activo == 'machine_learning' %}sidebar-link--active{% else %}sidebar-link--idle{% endif %}">
+                    <a href="{% url 'machine_learning:index' %}"
+                       class="flex items-center gap-3 px-3 py-2.5 text-sm transition-colors
+                              {% if modulo_activo == 'machine_learning' %}bg-red-600 text-white rounded-xl font-semibold shadow-sm{% else %}text-gray-500 rounded-xl hover:bg-gray-50 hover:text-gray-700{% endif %}">
                         <span class="material-symbols-outlined text-[20px]">analytics</span>
                         <span>Modelo Predictivo</span>
                     </a>
                 </li>
                 <li>
-                    <a href="{% url 'predicciones:index' %}" class="sidebar-link {% if modulo_activo == 'predicciones' %}sidebar-link--active{% else %}sidebar-link--idle{% endif %}">
+                    <a href="{% url 'predicciones:index' %}"
+                       class="flex items-center gap-3 px-3 py-2.5 text-sm transition-colors
+                              {% if modulo_activo == 'predicciones' %}bg-red-600 text-white rounded-xl font-semibold shadow-sm{% else %}text-gray-500 rounded-xl hover:bg-gray-50 hover:text-gray-700{% endif %}">
                         <span class="material-symbols-outlined text-[20px]">online_prediction</span>
                         <span>Predicciones</span>
                     </a>
                 </li>
                 <li>
                     <!-- Todavía no existe la ruta: se deja como enlace visual deshabilitado -->
-                    <span class="sidebar-link sidebar-link--disabled">
+                    <span class="flex items-center gap-3 px-3 py-2.5 text-sm text-gray-300 cursor-not-allowed">
                         <span class="material-symbols-outlined text-[20px]">assessment</span>
                         <span>Reportes</span>
-                        <span class="sidebar-badge-soon">Próximamente</span>
+                        <span class="ml-auto inline-flex items-center bg-gray-100 text-gray-400 rounded-full text-xs px-2 py-1">Próximamente</span>
                     </span>
                 </li>
             </ul>
@@ -104,10 +127,10 @@
         <div class="flex-1 flex flex-col min-w-0">
 
             <!-- Topbar simple: sin usuario, sin avatar, sin administrador -->
-            <header class="flex items-center justify-between px-4 md:px-8 h-16 border-b border-black/5 bg-white/70 backdrop-blur-sm sticky top-0 z-10">
-                <h1 class="font-semibold text-text-dark">{% block page_title %}Ruta del Sabor{% endblock %}</h1>
+            <header class="flex items-center justify-between px-4 md:px-8 h-16 border-b border-gray-100 bg-white/80 backdrop-blur-sm sticky top-0 z-10">
+                <h1 class="font-bold text-lg text-text-dark">{% block page_title %}Ruta del Sabor{% endblock %}</h1>
                 <a href="{% url 'predicciones:index' %}"
-                   class="inline-flex items-center gap-2 bg-primary hover:bg-primary-dark text-white text-sm font-medium px-4 py-2 rounded-full transition-colors duration-200 shadow-sm">
+                   class="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-medium px-4 py-2 rounded-xl transition-colors focus:outline-none focus:ring-2 focus:ring-red-300">
                     <span class="material-symbols-outlined text-[18px]">online_prediction</span>
                     Ir a Predicciones
                 </a>
@@ -119,25 +142,27 @@
         </div>
 
         <!-- Navegación inferior simplificada para móvil -->
-        <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-black/5 flex justify-around py-2 z-20">
-            <a href="{% url 'dashboard:inicio' %}" class="flex flex-col items-center gap-0.5 px-3 py-1 text-xs {% if modulo_activo == 'inicio' %}text-primary-dark font-semibold{% else %}text-stone-500{% endif %}">
+        <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 flex justify-around py-2 z-20">
+            <a href="{% url 'dashboard:inicio' %}" class="flex flex-col items-center gap-0.5 px-3 py-1 text-xs {% if modulo_activo == 'inicio' %}text-red-600 font-semibold{% else %}text-gray-500{% endif %}">
                 <span class="material-symbols-outlined text-[22px]">home</span>
                 Inicio
             </a>
-            <a href="{% url 'dashboard:index' %}" class="flex flex-col items-center gap-0.5 px-3 py-1 text-xs {% if modulo_activo == 'dashboard' %}text-primary-dark font-semibold{% else %}text-stone-500{% endif %}">
+            <a href="{% url 'dashboard:index' %}" class="flex flex-col items-center gap-0.5 px-3 py-1 text-xs {% if modulo_activo == 'dashboard' %}text-red-600 font-semibold{% else %}text-gray-500{% endif %}">
                 <span class="material-symbols-outlined text-[22px]">dashboard</span>
                 Panel
             </a>
-            <a href="{% url 'datasets:index' %}" class="flex flex-col items-center gap-0.5 px-3 py-1 text-xs {% if modulo_activo == 'datasets' %}text-primary-dark font-semibold{% else %}text-stone-500{% endif %}">
+            <a href="{% url 'datasets:index' %}" class="flex flex-col items-center gap-0.5 px-3 py-1 text-xs {% if modulo_activo == 'datasets' %}text-red-600 font-semibold{% else %}text-gray-500{% endif %}">
                 <span class="material-symbols-outlined text-[22px]">database</span>
                 Dataset
             </a>
-            <a href="{% url 'predicciones:index' %}" class="flex flex-col items-center gap-0.5 px-3 py-1 text-xs {% if modulo_activo == 'predicciones' %}text-primary-dark font-semibold{% else %}text-stone-500{% endif %}">
+            <a href="{% url 'predicciones:index' %}" class="flex flex-col items-center gap-0.5 px-3 py-1 text-xs {% if modulo_activo == 'predicciones' %}text-red-600 font-semibold{% else %}text-gray-500{% endif %}">
                 <span class="material-symbols-outlined text-[22px]">online_prediction</span>
                 Predicciones
             </a>
         </nav>
 
     </div>
+
+    {% block extra_js %}{% endblock %}
 </body>
 </html>

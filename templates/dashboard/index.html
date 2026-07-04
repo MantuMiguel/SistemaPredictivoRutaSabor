@@ -5,53 +5,53 @@
 
 {% block content %}
 
-    <p class="text-muted text-sm mb-6 max-w-2xl">
+    <p class="text-gray-500 text-sm mb-6 max-w-2xl mx-auto text-center">
         Predicción de demanda para apoyar la planificación de cocina y delivery:
         cuánto se va a pedir, de qué producto y en qué momento del día.
     </p>
 
     <!-- Cards de indicadores clave (valores de demostración, todavía no vienen del modelo) -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div class="bg-white rounded-2xl shadow-sm p-5 flex items-start justify-between gap-3 hover:shadow-md hover:-translate-y-0.5 transition-all">
+        <div class="bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-200 border border-gray-100 p-5 flex items-start justify-between gap-3">
             <div class="flex flex-col gap-1 min-w-0">
-                <span class="text-xs text-muted">Pedidos estimados del día</span>
+                <span class="text-xs text-gray-500">Pedidos estimados del día</span>
                 <span class="text-2xl font-bold text-text-dark">185</span>
-                <span class="text-xs font-semibold text-primary-dark bg-orange-100 px-2 py-0.5 rounded-full w-fit">+12% vs. ayer</span>
+                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-600 w-fit">+12% vs. ayer</span>
             </div>
-            <span class="w-11 h-11 rounded-full bg-primary text-white flex items-center justify-center shrink-0">
+            <span class="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center text-red-600 shrink-0">
                 <span class="material-symbols-outlined text-[20px]">shopping_bag</span>
             </span>
         </div>
 
-        <div class="bg-white rounded-2xl shadow-sm p-5 flex items-start justify-between gap-3 hover:shadow-md hover:-translate-y-0.5 transition-all">
+        <div class="bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-200 border border-gray-100 p-5 flex items-start justify-between gap-3">
             <div class="flex flex-col gap-1 min-w-0">
-                <span class="text-xs text-muted">Producto con mayor demanda</span>
+                <span class="text-xs text-gray-500">Producto con mayor demanda</span>
                 <span class="text-2xl font-bold text-text-dark">Hamburguesa Clásica</span>
-                <span class="text-xs font-semibold text-red-700 bg-red-100 px-2 py-0.5 rounded-full w-fit">Alta demanda</span>
+                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-red-100 text-red-600 w-fit">Alta demanda</span>
             </div>
-            <span class="w-11 h-11 rounded-full bg-red-600 text-white flex items-center justify-center shrink-0">
+            <span class="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center text-red-600 shrink-0">
                 <span class="material-symbols-outlined text-[20px]">lunch_dining</span>
             </span>
         </div>
 
-        <div class="bg-white rounded-2xl shadow-sm p-5 flex items-start justify-between gap-3 hover:shadow-md hover:-translate-y-0.5 transition-all">
+        <div class="bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-200 border border-gray-100 p-5 flex items-start justify-between gap-3">
             <div class="flex flex-col gap-1 min-w-0">
-                <span class="text-xs text-muted">Franja horaria crítica</span>
+                <span class="text-xs text-gray-500">Franja horaria crítica</span>
                 <span class="text-2xl font-bold text-text-dark">19:00 - 21:00</span>
-                <span class="text-xs font-semibold text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full w-fit">Hora pico</span>
+                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-600 w-fit">Hora pico</span>
             </div>
-            <span class="w-11 h-11 rounded-full bg-amber-600 text-white flex items-center justify-center shrink-0">
+            <span class="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600 shrink-0">
                 <span class="material-symbols-outlined text-[20px]">schedule</span>
             </span>
         </div>
 
-        <div class="bg-white rounded-2xl shadow-sm p-5 flex items-start justify-between gap-3 hover:shadow-md hover:-translate-y-0.5 transition-all">
+        <div class="bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-200 border border-gray-100 p-5 flex items-start justify-between gap-3">
             <div class="flex flex-col gap-1 min-w-0">
-                <span class="text-xs text-muted">Promoción con mayor impacto</span>
+                <span class="text-xs text-gray-500">Promoción con mayor impacto</span>
                 <span class="text-2xl font-bold text-text-dark">Combo Familiar</span>
-                <span class="text-xs font-semibold text-green-700 bg-green-100 px-2 py-0.5 rounded-full w-fit">+8% en conversión</span>
+                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-600 w-fit">+8% en conversión</span>
             </div>
-            <span class="w-11 h-11 rounded-full bg-green-600 text-white flex items-center justify-center shrink-0">
+            <span class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 shrink-0">
                 <span class="material-symbols-outlined text-[20px]">local_offer</span>
             </span>
         </div>
@@ -59,11 +59,11 @@
 
     <!-- Predicción de demanda por horas: barras hechas solo con HTML + CSS -->
     <div class="mt-10">
-        <h2 class="font-semibold text-text-dark mb-1">Predicción de demanda por horas</h2>
-        <p class="text-xs text-muted mb-4">Pedidos estimados por franja horaria (datos de demostración).</p>
+        <h2 class="font-bold text-lg text-text-dark mb-1 text-center">Predicción de demanda por horas</h2>
+        <p class="text-xs text-gray-500 mb-4 text-center">Pedidos estimados por franja horaria (datos de demostración).</p>
 
         <!-- AQUÍ LUEGO SE MOSTRARÁ LA PREDICCIÓN REAL DEL MODELO. -->
-        <div class="bg-white rounded-2xl shadow-sm p-6">
+        <div class="bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-200 border border-gray-100 p-6">
             <div class="hour-chart__bars">
                 <div class="hour-bar">
                     <div class="hour-bar__fill" style="height: 40%;"><span class="hour-bar__value">32</span></div>
@@ -102,7 +102,7 @@
                     <span class="hour-bar__label">8p</span>
                 </div>
             </div>
-            <div class="flex gap-5 mt-4 text-xs text-muted">
+            <div class="flex gap-5 mt-4 text-xs text-gray-500 justify-center">
                 <span class="inline-flex items-center gap-1.5"><span class="legend-dot legend-dot--normal"></span>Demanda normal</span>
                 <span class="inline-flex items-center gap-1.5"><span class="legend-dot legend-dot--critica"></span>Hora crítica</span>
             </div>
@@ -111,11 +111,11 @@
 
     <!-- Productos con mayor demanda -->
     <div class="mt-10">
-        <h2 class="font-semibold text-text-dark mb-1">Productos con mayor demanda</h2>
-        <p class="text-xs text-muted mb-4">Unidades estimadas para hoy (datos de demostración).</p>
+        <h2 class="font-bold text-lg text-text-dark mb-1 text-center">Productos con mayor demanda</h2>
+        <p class="text-xs text-gray-500 mb-4 text-center">Unidades estimadas para hoy (datos de demostración).</p>
 
         <!-- AQUÍ LUEGO IRÁN LOS PRODUCTOS CALCULADOS DESDE EL DATASET. -->
-        <div class="bg-white rounded-2xl shadow-sm px-6 py-2">
+        <div class="bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-200 border border-gray-100 px-6 py-2">
             <div class="product-row">
                 <div class="product-row__info">
                     <span class="product-row__icon"><span class="material-symbols-outlined text-[18px]">lunch_dining</span></span>
@@ -161,7 +161,7 @@
 
     <!-- Alertas y recomendaciones para la planificación de cocina -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-10">
-        <div class="bg-white rounded-2xl shadow-sm p-5">
+        <div class="bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-200 border border-gray-100 p-5">
             <h3 class="font-semibold text-text-dark mb-3 text-sm">Alertas operativas</h3>
 
             <div class="alert-item alert-item--danger">
@@ -182,49 +182,52 @@
             </div>
         </div>
 
-        <div class="bg-white rounded-2xl shadow-sm p-5">
+        <div class="bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-200 border border-gray-100 p-5">
             <h3 class="font-semibold text-text-dark mb-3 text-sm">Recomendaciones para cocina</h3>
             <ul class="recommend-list">
-                <li><span class="material-symbols-outlined text-[18px]">schedule</span>Preparar insumos antes de la franja crítica.</li>
-                <li><span class="material-symbols-outlined text-[18px]">star</span>Priorizar productos con mayor demanda estimada.</li>
-                <li><span class="material-symbols-outlined text-[18px]">category</span>Organizar cocina por categorías.</li>
-                <li><span class="material-symbols-outlined text-[18px]">local_shipping</span>Anticipar empaques y coordinación de delivery.</li>
+                <li><span class="recommend-list__icon"><span class="material-symbols-outlined text-[16px]">schedule</span></span>Preparar insumos antes de la franja crítica.</li>
+                <li><span class="recommend-list__icon"><span class="material-symbols-outlined text-[16px]">star</span></span>Priorizar productos con mayor demanda estimada.</li>
+                <li><span class="recommend-list__icon"><span class="material-symbols-outlined text-[16px]">category</span></span>Organizar cocina por categorías.</li>
+                <li><span class="recommend-list__icon"><span class="material-symbols-outlined text-[16px]">local_shipping</span></span>Anticipar empaques y coordinación de delivery.</li>
             </ul>
         </div>
     </div>
 
     <!-- Problemas operativos que el sistema busca reducir -->
     <div class="mt-10">
-        <h2 class="font-semibold text-text-dark mb-4">Problemas que resuelve</h2>
+        <h2 class="font-bold text-lg text-text-dark mb-4 text-center">Problemas que resuelve</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div class="bg-white rounded-2xl shadow-sm p-5">
+            <div class="bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-200 border border-gray-100 p-5">
                 <span class="material-symbols-outlined text-red-600 mb-2 block">hourglass_top</span>
                 <h4 class="font-semibold text-text-dark text-sm mb-1">Retrasos operativos</h4>
-                <p class="text-xs text-muted">Acumulación de pedidos en horas de alta demanda.</p>
+                <p class="text-xs text-gray-500">Acumulación de pedidos en horas de alta demanda.</p>
             </div>
-            <div class="bg-white rounded-2xl shadow-sm p-5">
+            <div class="bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-200 border border-gray-100 p-5">
                 <span class="material-symbols-outlined text-amber-600 mb-2 block">device_hub</span>
                 <h4 class="font-semibold text-text-dark text-sm mb-1">Falta de coordinación</h4>
-                <p class="text-xs text-muted">Entre las áreas de pedidos, cocina y delivery.</p>
+                <p class="text-xs text-gray-500">Entre las áreas de pedidos, cocina y delivery.</p>
             </div>
-            <div class="bg-white rounded-2xl shadow-sm p-5">
-                <span class="material-symbols-outlined text-primary mb-2 block">local_shipping</span>
+            <div class="bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-200 border border-gray-100 p-5">
+                <span class="material-symbols-outlined text-blue-600 mb-2 block">local_shipping</span>
                 <h4 class="font-semibold text-text-dark text-sm mb-1">Tiempos de entrega</h4>
-                <p class="text-xs text-muted">Incumplimiento de los tiempos prometidos.</p>
+                <p class="text-xs text-gray-500">Incumplimiento de los tiempos prometidos.</p>
             </div>
-            <div class="bg-white rounded-2xl shadow-sm p-5">
-                <span class="material-symbols-outlined text-stone-500 mb-2 block">psychology</span>
+            <div class="bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-200 border border-gray-100 p-5">
+                <span class="material-symbols-outlined text-gray-500 mb-2 block">psychology</span>
                 <h4 class="font-semibold text-text-dark text-sm mb-1">Dependencia manual</h4>
-                <p class="text-xs text-muted">Decisiones basadas solo en experiencia, sin datos.</p>
+                <p class="text-xs text-gray-500">Decisiones basadas solo en experiencia, sin datos.</p>
             </div>
         </div>
     </div>
 
     <!-- Accesos directos a los demás módulos -->
     <div class="mt-10 flex flex-wrap gap-3">
-        <a href="{% url 'datasets:index' %}" class="inline-flex items-center gap-2 border border-primary text-primary-dark hover:bg-orange-50 text-sm font-medium px-4 py-2 rounded-full transition-colors">Ver Dataset</a>
-        <a href="{% url 'machine_learning:index' %}" class="inline-flex items-center gap-2 border border-primary text-primary-dark hover:bg-orange-50 text-sm font-medium px-4 py-2 rounded-full transition-colors">Ver Modelo Predictivo</a>
-        <a href="{% url 'predicciones:index' %}" class="inline-flex items-center gap-2 bg-primary hover:bg-primary-dark text-white text-sm font-medium px-4 py-2 rounded-full transition-colors">Ir a Predicciones</a>
+        <a href="{% url 'datasets:index' %}"
+           class="bg-white hover:bg-red-50 text-red-600 border border-red-200 font-medium px-4 py-2 rounded-xl transition-colors focus:outline-none focus:ring-2 focus:ring-red-200">Ver Dataset</a>
+        <a href="{% url 'machine_learning:index' %}"
+           class="bg-white hover:bg-red-50 text-red-600 border border-red-200 font-medium px-4 py-2 rounded-xl transition-colors focus:outline-none focus:ring-2 focus:ring-red-200">Ver Modelo Predictivo</a>
+        <a href="{% url 'predicciones:index' %}"
+           class="bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-medium px-4 py-2 rounded-xl transition-colors focus:outline-none focus:ring-2 focus:ring-red-300">Ir a Predicciones</a>
     </div>
 
 {% endblock %}
