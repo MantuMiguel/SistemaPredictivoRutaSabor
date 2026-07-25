@@ -1,88 +1,222 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Inicio - Ruta del Sabor{% endblock %}
 {% block page_title %}Inicio{% endblock %}
 
 {% block content %}
 
-    <!-- Hero de bienvenida -->
-    <div class="bg-white rounded-2xl shadow-sm p-6 md:p-12 flex flex-col md:flex-row items-center gap-8">
-        <div class="flex-1 flex flex-col gap-4 text-center md:text-left">
-            <h1 class="text-3xl md:text-4xl font-bold text-text-dark leading-tight">
-                Bienvenido a <span class="text-primary">Ruta del Sabor</span>
-            </h1>
-            <p class="text-muted text-base max-w-xl">
-                Sistema inteligente de planificación y predicción de demanda gastronómica.
-                Anticipe los pedidos, coordine su cocina y organice el delivery con datos claros y visuales.
-            </p>
-            <div class="flex flex-wrap gap-3 justify-center md:justify-start mt-2">
-                <a href="{% url 'dashboard:index' %}"
-                   class="inline-flex items-center gap-2 bg-primary hover:bg-primary-dark text-white text-sm font-medium px-5 py-2.5 rounded-full transition-colors duration-200 shadow-sm">
-                    <span class="material-symbols-outlined text-[18px]">dashboard</span>
-                    Ir al Panel de Control
-                </a>
-                <a href="{% url 'predicciones:index' %}"
-                   class="inline-flex items-center gap-2 bg-orange-50 hover:bg-orange-100 text-primary-dark text-sm font-medium px-5 py-2.5 rounded-full transition-colors duration-200 border border-orange-100">
-                    <span class="material-symbols-outlined text-[18px]">online_prediction</span>
-                    Ver Predicciones
-                </a>
+    <!-- A. Hero principal -->
+    <div class="relative rounded-2xl shadow-md overflow-hidden border border-orange-100 bg-gradient-to-br from-orange-50 via-amber-50 to-stone-100">
+        <div class="absolute -right-16 -top-16 w-56 h-56 bg-primary/10 rounded-full blur-3xl"></div>
+        <div class="absolute -left-10 -bottom-10 w-40 h-40 bg-amber-700/10 rounded-full blur-3xl"></div>
+
+        <div class="relative p-6 md:p-12 flex flex-col md:flex-row items-center gap-8">
+            <div class="flex-1 flex flex-col gap-4 text-center md:text-left">
+                <span class="inline-flex items-center gap-1.5 self-center md:self-start bg-white/70 text-primary-dark text-xs font-semibold px-3 py-1 rounded-full border border-orange-200 w-fit">
+                    <span class="material-symbols-outlined text-[14px]">bolt</span>
+                    Predicción inteligente de demanda
+                </span>
+                <h1 class="text-3xl md:text-4xl font-bold text-text-dark leading-tight">
+                    Ruta del Sabor <span class="text-primary">ML</span>
+                </h1>
+                <p class="text-stone-700 text-base font-medium max-w-xl">
+                    Sistema predictivo para planificar la demanda, cocina y delivery.
+                </p>
+                <p class="text-stone-600 text-sm max-w-xl">
+                    A partir del historial de ventas, el sistema predice cuántos pedidos esperar por producto,
+                    fecha y franja horaria &mdash; para que la cocina y el delivery se preparen con anticipación
+                    en vez de reaccionar sobre la marcha.
+                </p>
+                <div class="flex flex-wrap gap-3 justify-center md:justify-start mt-2">
+                    <a href="{% url 'dashboard:index' %}"
+                       class="inline-flex items-center gap-2 bg-primary hover:bg-primary-dark text-white text-sm font-semibold px-6 py-3 rounded-full transition-all duration-200 shadow-md hover:shadow-lg hover:-translate-y-0.5">
+                        <span class="material-symbols-outlined text-[18px]">dashboard</span>
+                        Ir al Panel de Control
+                    </a>
+                    <a href="{% url 'predicciones:index' %}"
+                       class="inline-flex items-center gap-2 bg-white/80 hover:bg-white text-primary-dark text-sm font-semibold px-6 py-3 rounded-full transition-all duration-200 border border-orange-200 shadow-sm hover:shadow-md">
+                        <span class="material-symbols-outlined text-[18px]">online_prediction</span>
+                        Ver Predicciones
+                    </a>
+                </div>
+            </div>
+
+            <!-- Imagen gastronómica local -->
+            <div class="w-full md:w-5/12 shrink-0">
+                <img src="{% static 'img/hamburguesa-hero.jpg' %}" alt="Hamburguesa Ruta del Sabor"
+                     class="w-full h-64 md:h-80 object-cover rounded-2xl shadow-lg border-4 border-white">
             </div>
         </div>
+    </div>
 
-        <!-- Bloque visual tipo hero, hecho solo con CSS (sin imágenes externas) -->
-        <div class="w-full md:w-5/12 h-64 rounded-2xl bg-gradient-to-br from-orange-50 to-orange-100/60 border border-orange-100 flex flex-col items-center justify-center gap-3 relative overflow-hidden">
-            <div class="absolute -right-10 -top-10 w-40 h-40 bg-primary/10 rounded-full blur-2xl"></div>
-            <div class="absolute -left-8 -bottom-8 w-32 h-32 bg-primary-dark/10 rounded-full blur-2xl"></div>
-            <span class="w-16 h-16 rounded-full bg-primary text-white flex items-center justify-center relative z-10">
-                <span class="material-symbols-outlined text-[32px]">restaurant_menu</span>
-            </span>
-            <span class="text-sm font-semibold text-primary-dark relative z-10">Predicción de demanda en tiempo real</span>
-            <div class="flex gap-4 relative z-10 mt-1">
-                <div class="text-center">
-                    <span class="block text-lg font-bold text-text-dark">185</span>
-                    <span class="block text-[11px] text-muted">pedidos hoy</span>
+    <!-- B. Problemas que resuelve -->
+    <div class="mt-10">
+        <h2 class="font-bold text-lg text-text-dark mb-1 text-center">Problemas que resuelve</h2>
+        <p class="text-xs text-stone-500 mb-4 text-center">Situaciones operativas frecuentes en un negocio gastronómico sin planificación basada en datos.</p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+            <div class="bg-white rounded-2xl border border-orange-100 shadow-sm p-4 flex flex-col items-center text-center gap-2 hover:shadow-md hover:-translate-y-0.5 transition-all">
+                <span class="w-11 h-11 rounded-full bg-amber-50 text-amber-700 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-[20px]">hourglass_bottom</span>
+                </span>
+                <p class="text-xs text-stone-700 font-medium leading-snug">Retrasos operativos</p>
+            </div>
+            <div class="bg-white rounded-2xl border border-orange-100 shadow-sm p-4 flex flex-col items-center text-center gap-2 hover:shadow-md hover:-translate-y-0.5 transition-all">
+                <span class="w-11 h-11 rounded-full bg-amber-50 text-amber-700 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-[20px]">sync_problem</span>
+                </span>
+                <p class="text-xs text-stone-700 font-medium leading-snug">Falta de coordinación entre cocina y delivery</p>
+            </div>
+            <div class="bg-white rounded-2xl border border-orange-100 shadow-sm p-4 flex flex-col items-center text-center gap-2 hover:shadow-md hover:-translate-y-0.5 transition-all">
+                <span class="w-11 h-11 rounded-full bg-amber-50 text-amber-700 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-[20px]">local_fire_department</span>
+                </span>
+                <p class="text-xs text-stone-700 font-medium leading-snug">Saturación en horas pico</p>
+            </div>
+            <div class="bg-white rounded-2xl border border-orange-100 shadow-sm p-4 flex flex-col items-center text-center gap-2 hover:shadow-md hover:-translate-y-0.5 transition-all">
+                <span class="w-11 h-11 rounded-full bg-amber-50 text-amber-700 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-[20px]">psychology_alt</span>
+                </span>
+                <p class="text-xs text-stone-700 font-medium leading-snug">Dependencia de la experiencia manual</p>
+            </div>
+            <div class="bg-white rounded-2xl border border-orange-100 shadow-sm p-4 flex flex-col items-center text-center gap-2 hover:shadow-md hover:-translate-y-0.5 transition-all">
+                <span class="w-11 h-11 rounded-full bg-amber-50 text-amber-700 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-[20px]">sentiment_dissatisfied</span>
+                </span>
+                <p class="text-xs text-stone-700 font-medium leading-snug">Insatisfacción por tiempos de entrega</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- C. Qué permite hacer el sistema -->
+    <div class="mt-10">
+        <h2 class="font-bold text-lg text-text-dark mb-4 text-center">Qué permite hacer el sistema</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div class="bg-white rounded-2xl shadow-sm border border-orange-100 p-5 hover:shadow-md hover:-translate-y-0.5 transition-all">
+                <span class="w-12 h-12 rounded-full bg-orange-50 text-primary flex items-center justify-center mb-3">
+                    <span class="material-symbols-outlined text-[22px]">database</span>
+                </span>
+                <h3 class="font-semibold text-text-dark mb-1">Analizar dataset histórico</h3>
+                <p class="text-sm text-stone-500">Carga y valida el historial de ventas que alimenta a todo el sistema.</p>
+            </div>
+            <div class="bg-white rounded-2xl shadow-sm border border-orange-100 p-5 hover:shadow-md hover:-translate-y-0.5 transition-all">
+                <span class="w-12 h-12 rounded-full bg-orange-50 text-primary flex items-center justify-center mb-3">
+                    <span class="material-symbols-outlined text-[22px]">model_training</span>
+                </span>
+                <h3 class="font-semibold text-text-dark mb-1">Entrenar modelo predictivo</h3>
+                <p class="text-sm text-stone-500">Compara algoritmos y guarda el modelo con mejor desempeño.</p>
+            </div>
+            <div class="bg-white rounded-2xl shadow-sm border border-orange-100 p-5 hover:shadow-md hover:-translate-y-0.5 transition-all">
+                <span class="w-12 h-12 rounded-full bg-orange-50 text-primary flex items-center justify-center mb-3">
+                    <span class="material-symbols-outlined text-[22px]">online_prediction</span>
+                </span>
+                <h3 class="font-semibold text-text-dark mb-1">Predecir demanda por fecha y franja</h3>
+                <p class="text-sm text-stone-500">Consulta cuántos pedidos esperar en una fecha y horario específicos.</p>
+            </div>
+            <div class="bg-white rounded-2xl shadow-sm border border-orange-100 p-5 hover:shadow-md hover:-translate-y-0.5 transition-all">
+                <span class="w-12 h-12 rounded-full bg-orange-50 text-primary flex items-center justify-center mb-3">
+                    <span class="material-symbols-outlined text-[22px]">trending_up</span>
+                </span>
+                <h3 class="font-semibold text-text-dark mb-1">Identificar productos más demandados</h3>
+                <p class="text-sm text-stone-500">Detecta qué productos van a liderar la demanda antes de que ocurra.</p>
+            </div>
+            <div class="bg-white rounded-2xl shadow-sm border border-orange-100 p-5 hover:shadow-md hover:-translate-y-0.5 transition-all">
+                <span class="w-12 h-12 rounded-full bg-orange-50 text-primary flex items-center justify-center mb-3">
+                    <span class="material-symbols-outlined text-[22px]">groups</span>
+                </span>
+                <h3 class="font-semibold text-text-dark mb-1">Recomendar personal operativo por franja</h3>
+                <p class="text-sm text-stone-500">Sugiere cuánto personal asignar a cocina, despacho y delivery.</p>
+            </div>
+            <div class="bg-white rounded-2xl shadow-sm border border-orange-100 p-5 hover:shadow-md hover:-translate-y-0.5 transition-all">
+                <span class="w-12 h-12 rounded-full bg-orange-50 text-primary flex items-center justify-center mb-3">
+                    <span class="material-symbols-outlined text-[22px]">local_shipping</span>
+                </span>
+                <h3 class="font-semibold text-text-dark mb-1">Apoyar decisiones de cocina y delivery</h3>
+                <p class="text-sm text-stone-500">Recomendaciones operativas concretas para el turno según la demanda esperada.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- D. Flujo del sistema -->
+    <div class="mt-10">
+        <h2 class="font-bold text-lg text-text-dark mb-4 text-center">Flujo del sistema</h2>
+        <div class="bg-white rounded-2xl shadow-sm border border-orange-100 p-6">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+                <div class="flex flex-col items-center text-center gap-2 flex-1">
+                    <span class="w-14 h-14 rounded-full bg-orange-50 text-primary flex items-center justify-center">
+                        <span class="material-symbols-outlined text-[26px]">database</span>
+                    </span>
+                    <span class="text-sm font-semibold text-text-dark">Dataset histórico</span>
                 </div>
-                <div class="text-center">
-                    <span class="block text-lg font-bold text-text-dark">19-21h</span>
-                    <span class="block text-[11px] text-muted">hora pico</span>
+                <span class="material-symbols-outlined text-orange-200 text-[26px] rotate-90 md:rotate-0">arrow_forward</span>
+                <div class="flex flex-col items-center text-center gap-2 flex-1">
+                    <span class="w-14 h-14 rounded-full bg-orange-50 text-primary flex items-center justify-center">
+                        <span class="material-symbols-outlined text-[26px]">model_training</span>
+                    </span>
+                    <span class="text-sm font-semibold text-text-dark">Modelo predictivo</span>
+                </div>
+                <span class="material-symbols-outlined text-orange-200 text-[26px] rotate-90 md:rotate-0">arrow_forward</span>
+                <div class="flex flex-col items-center text-center gap-2 flex-1">
+                    <span class="w-14 h-14 rounded-full bg-orange-50 text-primary flex items-center justify-center">
+                        <span class="material-symbols-outlined text-[26px]">online_prediction</span>
+                    </span>
+                    <span class="text-sm font-semibold text-text-dark">Predicción de demanda</span>
+                </div>
+                <span class="material-symbols-outlined text-orange-200 text-[26px] rotate-90 md:rotate-0">arrow_forward</span>
+                <div class="flex flex-col items-center text-center gap-2 flex-1">
+                    <span class="w-14 h-14 rounded-full bg-orange-50 text-primary flex items-center justify-center">
+                        <span class="material-symbols-outlined text-[26px]">groups</span>
+                    </span>
+                    <span class="text-sm font-semibold text-text-dark">Planificación operativa</span>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Capacidades estratégicas -->
-    <div class="mt-10">
-        <h2 class="font-bold text-lg text-text-dark mb-4 text-center">Capacidades Estratégicas</h2>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div class="bg-white rounded-2xl shadow-sm p-5 hover:shadow-md hover:-translate-y-0.5 transition-all">
-                <span class="w-12 h-12 rounded-xl bg-orange-50 text-primary flex items-center justify-center mb-3">
-                    <span class="material-symbols-outlined text-[22px]">trending_up</span>
+    <!-- E. Cards de módulos -->
+    <div class="mt-10 mb-4">
+        <h2 class="font-bold text-lg text-text-dark mb-4 text-center">Módulos del sistema</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <a href="{% url 'datasets:index' %}"
+               class="bg-white rounded-2xl shadow-sm border border-orange-100 p-5 flex flex-col gap-3 hover:shadow-md hover:-translate-y-0.5 transition-all">
+                <span class="w-11 h-11 rounded-full bg-orange-50 text-primary flex items-center justify-center">
+                    <span class="material-symbols-outlined text-[20px]">database</span>
                 </span>
-                <h3 class="font-semibold text-text-dark mb-1">Anticipación de Pedidos</h3>
-                <p class="text-sm text-muted">
-                    Proyecte la demanda por hora y prepare su cocina antes de los picos de pedidos.
-                </p>
-            </div>
-
-            <div class="bg-white rounded-2xl shadow-sm p-5 hover:shadow-md hover:-translate-y-0.5 transition-all">
-                <span class="w-12 h-12 rounded-xl bg-orange-50 text-primary flex items-center justify-center mb-3">
-                    <span class="material-symbols-outlined text-[22px]">inventory_2</span>
+                <div>
+                    <h3 class="font-semibold text-text-dark text-sm mb-0.5">Dataset Histórico</h3>
+                    <p class="text-xs text-stone-500">Carga y valida el historial de ventas.</p>
+                </div>
+            </a>
+            <a href="{% url 'machine_learning:index' %}"
+               class="bg-white rounded-2xl shadow-sm border border-orange-100 p-5 flex flex-col gap-3 hover:shadow-md hover:-translate-y-0.5 transition-all">
+                <span class="w-11 h-11 rounded-full bg-orange-50 text-primary flex items-center justify-center">
+                    <span class="material-symbols-outlined text-[20px]">analytics</span>
                 </span>
-                <h3 class="font-semibold text-text-dark mb-1">Optimización de Insumos</h3>
-                <p class="text-sm text-muted">
-                    Reduzca el desperdicio y evite roturas de stock priorizando los productos más solicitados.
-                </p>
-            </div>
-
-            <div class="bg-white rounded-2xl shadow-sm p-5 hover:shadow-md hover:-translate-y-0.5 transition-all">
-                <span class="w-12 h-12 rounded-xl bg-orange-50 text-primary flex items-center justify-center mb-3">
-                    <span class="material-symbols-outlined text-[22px]">local_shipping</span>
+                <div>
+                    <h3 class="font-semibold text-text-dark text-sm mb-0.5">Modelo Predictivo</h3>
+                    <p class="text-xs text-stone-500">Entrena y compara los modelos de demanda.</p>
+                </div>
+            </a>
+            <a href="{% url 'predicciones:index' %}"
+               class="bg-white rounded-2xl shadow-sm border border-orange-100 p-5 flex flex-col gap-3 hover:shadow-md hover:-translate-y-0.5 transition-all">
+                <span class="w-11 h-11 rounded-full bg-orange-50 text-primary flex items-center justify-center">
+                    <span class="material-symbols-outlined text-[20px]">online_prediction</span>
                 </span>
-                <h3 class="font-semibold text-text-dark mb-1">Mejora en Delivery</h3>
-                <p class="text-sm text-muted">
-                    Coordine de forma proactiva con los repartidores y mantenga los tiempos de espera al mínimo.
-                </p>
-            </div>
+                <div>
+                    <h3 class="font-semibold text-text-dark text-sm mb-0.5">Predicciones</h3>
+                    <p class="text-xs text-stone-500">Consulta la demanda futura por fecha y franja.</p>
+                </div>
+            </a>
+            <a href="{% url 'dashboard:index' %}"
+               class="bg-white rounded-2xl shadow-sm border border-orange-100 p-5 flex flex-col gap-3 hover:shadow-md hover:-translate-y-0.5 transition-all">
+                <span class="w-11 h-11 rounded-full bg-orange-50 text-primary flex items-center justify-center">
+                    <span class="material-symbols-outlined text-[20px]">dashboard</span>
+                </span>
+                <div>
+                    <h3 class="font-semibold text-text-dark text-sm mb-0.5">Panel de Control</h3>
+                    <p class="text-xs text-stone-500">Resumen ejecutivo con los datos reales del sistema.</p>
+                </div>
+            </a>
         </div>
     </div>
 

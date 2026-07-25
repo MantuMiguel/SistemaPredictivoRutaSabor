@@ -140,6 +140,30 @@
 
     {% if prediccion and prediccion.estado == 'generado' %}
 
+        <!-- Contexto de la consulta: sobre qué fecha/franja es esta predicción -->
+        <div class="mb-6 bg-white rounded-2xl shadow-sm border border-gray-100 px-5 py-4 flex flex-wrap items-center gap-x-8 gap-y-3">
+            <div class="flex items-center gap-2.5">
+                <span class="w-9 h-9 rounded-xl bg-red-50 flex items-center justify-center text-red-600 shrink-0">
+                    <span class="material-symbols-outlined text-[18px]">event</span>
+                </span>
+                <div>
+                    <span class="block text-[11px] text-gray-500">Fecha analizada</span>
+                    <span class="block text-sm font-semibold text-text-dark">
+                        {{ prediccion.fecha_prediccion|date:"d/m/Y" }}{% if prediccion.resultado_detallado.dia_semana %} &middot; {{ prediccion.resultado_detallado.dia_semana }}{% endif %}
+                    </span>
+                </div>
+            </div>
+            <div class="flex items-center gap-2.5">
+                <span class="w-9 h-9 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600 shrink-0">
+                    <span class="material-symbols-outlined text-[18px]">schedule</span>
+                </span>
+                <div>
+                    <span class="block text-[11px] text-gray-500">Franja consultada</span>
+                    <span class="block text-sm font-semibold text-text-dark">{{ prediccion.franja_horaria }}</span>
+                </div>
+            </div>
+        </div>
+
         <!-- Cards superiores -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
             <div class="bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-200 border border-gray-100 p-5 flex items-start justify-between gap-3">
@@ -214,6 +238,148 @@
             </div>
         </div>
 
+        <!-- Planificación de Personal Operativo -->
+        {% with personal_franjas=prediccion.resultado_detallado.personal_operativo_por_franja personal_pico=prediccion.resultado_detallado.personal_operativo_pico %}
+        <div class="mb-10">
+            <h2 class="font-bold text-lg text-text-dark mb-1 text-center">Planificación de Personal Operativo</h2>
+
+            {% if personal_franjas %}
+                <p class="text-xs text-gray-500 mb-4 text-center">
+                    Personal recomendado según la demanda estimada de esta consulta.
+                </p>
+
+                {% if personal_franjas|length == 1 %}
+                    {% with franja=personal_franjas.0 %}
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 md:p-6">
+                        <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+                            <span class="font-bold text-text-dark">{{ franja.franja_horaria }} &middot; {{ franja.pedidos_estimados }} pedidos estimados</span>
+                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium
+                                {% if franja.nivel_demanda == 'Demanda crítica' %}bg-red-100 text-red-600
+                                {% elif franja.nivel_demanda == 'Demanda alta' %}bg-orange-100 text-orange-600
+                                {% elif franja.nivel_demanda == 'Demanda media' %}bg-amber-100 text-amber-600
+                                {% else %}bg-green-100 text-green-600{% endif %}">
+                                {{ franja.nivel_demanda }}
+                            </span>
+                        </div>
+                        <div class="grid grid-cols-3 gap-4 mb-4">
+                            <div class="flex flex-col items-center gap-1 bg-gray-50 rounded-xl py-4">
+                                <span class="material-symbols-outlined text-red-600 text-[22px]">skillet</span>
+                                <span class="text-2xl font-bold text-text-dark">{{ franja.personal_cocina }}</span>
+                                <span class="text-xs text-gray-500">Cocina</span>
+                            </div>
+                            <div class="flex flex-col items-center gap-1 bg-gray-50 rounded-xl py-4">
+                                <span class="material-symbols-outlined text-red-600 text-[22px]">inventory_2</span>
+                                <span class="text-2xl font-bold text-text-dark">{{ franja.personal_despacho }}</span>
+                                <span class="text-xs text-gray-500">Despacho/empaque</span>
+                            </div>
+                            <div class="flex flex-col items-center gap-1 bg-gray-50 rounded-xl py-4">
+                                <span class="material-symbols-outlined text-red-600 text-[22px]">local_shipping</span>
+                                <span class="text-2xl font-bold text-text-dark">{{ franja.personal_delivery }}</span>
+                                <span class="text-xs text-gray-500">Delivery/coordinación</span>
+                            </div>
+                        </div>
+                        <div class="alert-item alert-item--info">
+                            <span class="material-symbols-outlined text-[18px]">groups</span>
+                            <span class="alert-item__desc">{{ franja.recomendacion_texto }}</span>
+                        </div>
+                    </div>
+                    {% endwith %}
+                {% else %}
+                    {% if personal_pico %}
+                    <div class="relative bg-white rounded-2xl shadow-sm border-2 border-orange-300 p-5 md:p-6 mb-4 overflow-hidden">
+                        <div class="absolute inset-y-0 left-0 w-1.5 bg-gradient-to-b from-orange-400 to-red-500"></div>
+                        <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+                            <div class="flex items-center gap-2">
+                                <span class="w-9 h-9 rounded-xl bg-orange-50 text-orange-600 flex items-center justify-center shrink-0">
+                                    <span class="material-symbols-outlined text-[20px]">local_fire_department</span>
+                                </span>
+                                <span class="font-bold text-text-dark">Franja crítica: {{ personal_pico.franja_horaria }}</span>
+                            </div>
+                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-600">
+                                <span class="material-symbols-outlined text-[14px]">priority_high</span> Crítica
+                            </span>
+                        </div>
+                        <div class="grid grid-cols-2 lg:grid-cols-5 gap-4">
+                            <div class="flex flex-col gap-1">
+                                <span class="text-xs text-gray-500">Pedidos estimados</span>
+                                <span class="text-2xl font-bold text-text-dark">{{ personal_pico.pedidos_estimados }}</span>
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <span class="text-xs text-gray-500">Nivel de demanda</span>
+                                <span class="text-lg font-bold text-text-dark leading-tight">{{ personal_pico.nivel_demanda }}</span>
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <span class="text-xs text-gray-500">Cocina</span>
+                                <span class="text-2xl font-bold text-text-dark">{{ personal_pico.personal_cocina }}</span>
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <span class="text-xs text-gray-500">Despacho/empaque</span>
+                                <span class="text-2xl font-bold text-text-dark">{{ personal_pico.personal_despacho }}</span>
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <span class="text-xs text-gray-500">Delivery/coordinación</span>
+                                <span class="text-2xl font-bold text-text-dark">{{ personal_pico.personal_delivery }}</span>
+                            </div>
+                        </div>
+                        <div class="alert-item alert-item--info mt-4">
+                            <span class="material-symbols-outlined text-[18px]">groups</span>
+                            <span class="alert-item__desc">{{ personal_pico.recomendacion_texto }}</span>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        {% for franja in personal_franjas %}
+                            <div class="bg-white rounded-2xl shadow-sm border p-5
+                                {% if franja.es_franja_critica %}border-orange-300{% else %}border-gray-100{% endif %}">
+                                <div class="flex items-center justify-between mb-3">
+                                    <span class="font-bold text-text-dark">{{ franja.franja_horaria }}</span>
+                                    {% if franja.es_franja_critica %}
+                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-red-100 text-red-600">Crítica</span>
+                                    {% endif %}
+                                </div>
+                                <div class="flex items-center justify-between mb-4">
+                                    <div>
+                                        <span class="block text-[11px] text-gray-500">Pedidos estimados</span>
+                                        <span class="block text-lg font-bold text-text-dark">{{ franja.pedidos_estimados }}</span>
+                                    </div>
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium
+                                        {% if franja.nivel_demanda == 'Demanda crítica' %}bg-red-100 text-red-600
+                                        {% elif franja.nivel_demanda == 'Demanda alta' %}bg-orange-100 text-orange-600
+                                        {% elif franja.nivel_demanda == 'Demanda media' %}bg-amber-100 text-amber-600
+                                        {% else %}bg-green-100 text-green-600{% endif %}">
+                                        {{ franja.nivel_demanda }}
+                                    </span>
+                                </div>
+                                <div class="grid grid-cols-3 gap-2 text-center border-t border-gray-100 pt-3">
+                                    <div class="flex flex-col items-center gap-0.5">
+                                        <span class="material-symbols-outlined text-[16px] text-gray-400">skillet</span>
+                                        <span class="text-base font-bold text-text-dark">{{ franja.personal_cocina }}</span>
+                                        <span class="text-[10px] text-gray-500">Cocina</span>
+                                    </div>
+                                    <div class="flex flex-col items-center gap-0.5">
+                                        <span class="material-symbols-outlined text-[16px] text-gray-400">inventory_2</span>
+                                        <span class="text-base font-bold text-text-dark">{{ franja.personal_despacho }}</span>
+                                        <span class="text-[10px] text-gray-500">Despacho</span>
+                                    </div>
+                                    <div class="flex flex-col items-center gap-0.5">
+                                        <span class="material-symbols-outlined text-[16px] text-gray-400">local_shipping</span>
+                                        <span class="text-base font-bold text-text-dark">{{ franja.personal_delivery }}</span>
+                                        <span class="text-[10px] text-gray-500">Delivery</span>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% else %}
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 text-center text-sm text-gray-500">
+                    La planificación de personal se generará cuando exista una predicción válida por franja horaria.
+                </div>
+            {% endif %}
+        </div>
+        {% endwith %}
+
         <!-- Top productos esperados -->
         <div class="mb-10">
             <h2 class="font-bold text-lg text-text-dark mb-3 text-center">Top productos esperados</h2>
@@ -234,7 +400,7 @@
         <!-- Centro de Recomendaciones Inteligentes -->
         <div class="mb-10">
             <h2 class="font-bold text-lg text-text-dark mb-3 text-center">Centro de Recomendaciones Inteligentes</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div class="bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-200 border border-gray-100 p-5">
                     <h3 class="text-sm font-semibold text-text-dark mb-3 flex items-center gap-2">
                         <span class="material-symbols-outlined text-red-600 text-[18px]">inventory_2</span>
@@ -259,21 +425,6 @@
                         <ul class="recommend-list">
                             {% for texto in prediccion.recomendaciones.cocina %}
                                 <li><span class="recommend-list__icon"><span class="material-symbols-outlined text-[16px]">soup_kitchen</span></span>{{ texto }}</li>
-                            {% endfor %}
-                        </ul>
-                    {% else %}
-                        <p class="text-xs text-gray-400">Sin recomendaciones para esta consulta.</p>
-                    {% endif %}
-                </div>
-                <div class="bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-200 border border-gray-100 p-5">
-                    <h3 class="text-sm font-semibold text-text-dark mb-3 flex items-center gap-2">
-                        <span class="material-symbols-outlined text-blue-600 text-[18px]">groups</span>
-                        Personal
-                    </h3>
-                    {% if prediccion.recomendaciones.personal %}
-                        <ul class="recommend-list">
-                            {% for texto in prediccion.recomendaciones.personal %}
-                                <li><span class="recommend-list__icon"><span class="material-symbols-outlined text-[16px]">badge</span></span>{{ texto }}</li>
                             {% endfor %}
                         </ul>
                     {% else %}

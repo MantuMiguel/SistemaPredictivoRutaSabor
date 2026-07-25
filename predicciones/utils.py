@@ -114,20 +114,28 @@ def _leer_dataframe(file_path):
     raise ValueError(f'Extensión no soportada: .{extension}')
 
 
-def cargar_pipelines(training_run):
-    media_root = Path(settings.MEDIA_ROOT)
-    ruta_demanda = media_root / training_run.ruta_modelo_demanda
-    ruta_producto = media_root / training_run.ruta_modelo_producto
-
-    if not ruta_demanda.exists() or not ruta_producto.exists():
+def _cargar_joblib(ruta_relativa, etiqueta):
+    ruta = Path(settings.MEDIA_ROOT) / ruta_relativa
+    if not ruta.exists():
         raise FileNotFoundError(
-            'No se encontraron los archivos del modelo entrenado (.joblib) en media/models/. '
+            f'No se encontró el modelo de {etiqueta} (.joblib) en media/models/. '
             'Vuelve a entrenar el modelo desde Modelo Predictivo.'
         )
+    return joblib.load(ruta)
 
-    pipeline_demanda = joblib.load(ruta_demanda)
-    pipeline_producto = joblib.load(ruta_producto)
-    return pipeline_demanda, pipeline_producto
+
+def cargar_pipeline_demanda(training_run):
+    """Carga únicamente el modelo de demanda total (más liviano que cargar_pipelines)."""
+    return _cargar_joblib(training_run.ruta_modelo_demanda, 'demanda')
+
+
+def cargar_pipeline_producto(training_run):
+    """Carga únicamente el modelo de demanda por producto."""
+    return _cargar_joblib(training_run.ruta_modelo_producto, 'producto')
+
+
+def cargar_pipelines(training_run):
+    return cargar_pipeline_demanda(training_run), cargar_pipeline_producto(training_run)
 
 
 # ------------------------------------------------------------------
@@ -210,11 +218,15 @@ def construir_contexto_historico(dataset_valido):
 # Variables temporales y de clima a partir de la consulta del usuario
 # ------------------------------------------------------------------
 
-_DIAS_SEMANA = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo']
+DIAS_SEMANA = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo']
+
+
+def nombre_dia_semana(fecha):
+    return DIAS_SEMANA[fecha.weekday()]
 
 
 def calcular_variables_temporales(fecha_prediccion, contexto):
-    dia_semana = _DIAS_SEMANA[fecha_prediccion.weekday()]
+    dia_semana = nombre_dia_semana(fecha_prediccion)
     mes = fecha_prediccion.month
     anio = fecha_prediccion.year
     es_fin_semana = int(fecha_prediccion.weekday() >= 5)
@@ -343,6 +355,92 @@ def nivel_demanda_franja(valor):
 
 def nivel_demanda_diaria(valor):
     return _nivel_por_rango(valor, RANGOS_DEMANDA_DIARIA)
+
+
+# ------------------------------------------------------------------
+# Planificación de personal operativo
+#
+# Reglas de negocio fijas (no son un modelo de ML): a partir de los pedidos
+# estimados en la franja de mayor demanda, se recomienda cuántas personas se
+# necesitan en Cocina, Despacho/empaque y Delivery/coordinación.
+# ------------------------------------------------------------------
+
+RANGOS_PERSONAL_OPERATIVO = [
+    (0, 25, 'Demanda baja', {
+        'cocina': 1, 'despacho': 1, 'delivery': 1,
+        'texto': 'Turno mínimo: el personal base es suficiente para cubrir la demanda esperada.',
+    }),
+    (26, 50, 'Demanda media', {
+        'cocina': 2, 'despacho': 1, 'delivery': 2,
+        'texto': 'Reforzar cocina y delivery para sostener el ritmo de pedidos.',
+    }),
+    (51, 80, 'Demanda alta', {
+        'cocina': 3, 'despacho': 2, 'delivery': 3,
+        'texto': 'Convocar turno completo: reforzar cocina, despacho y delivery.',
+    }),
+    (81, None, 'Demanda crítica', {
+        'cocina': 4, 'despacho': 2, 'delivery': 4,
+        'texto': 'Activar el máximo personal disponible: se espera saturación en cocina y delivery.',
+    }),
+]
+
+
+def calcular_personal_operativo(pedidos_estimados):
+    """
+    Función pura (sin acceso a base de datos): a partir de la demanda de
+    pedidos estimada, aplica reglas de negocio fijas y devuelve la
+    planificación de personal operativo recomendada.
+    """
+    pedidos = int(max(0, round(pedidos_estimados or 0)))
+
+    for minimo, maximo, nivel, personal in RANGOS_PERSONAL_OPERATIVO:
+        if pedidos >= minimo and (maximo is None or pedidos <= maximo):
+            return {
+                'nivel_demanda': nivel,
+                'personal_cocina': personal['cocina'],
+                'personal_despacho': personal['despacho'],
+                'personal_delivery': personal['delivery'],
+                'recomendacion_texto': personal['texto'],
+            }
+
+    ultimo = RANGOS_PERSONAL_OPERATIVO[-1][3]
+    return {
+        'nivel_demanda': RANGOS_PERSONAL_OPERATIVO[-1][2],
+        'personal_cocina': ultimo['cocina'],
+        'personal_despacho': ultimo['despacho'],
+        'personal_delivery': ultimo['delivery'],
+        'recomendacion_texto': ultimo['texto'],
+    }
+
+
+def calcular_planificacion_personal_por_franja(demanda_por_franja):
+    """
+    demanda_por_franja: iterable de dicts con 'franja_horaria' y 'pedidos_estimados'
+    (p. ej. el 'resultado_por_franja' de generar_prediccion, o las celdas de un
+    día del mapa de calor del Dashboard).
+
+    Aplica calcular_personal_operativo() a cada franja (no duplica reglas) y
+    marca con es_franja_critica=True la franja de mayor demanda del lote.
+    """
+    filas = []
+    for item in demanda_por_franja:
+        personal = calcular_personal_operativo(item['pedidos_estimados'])
+        filas.append({
+            'franja_horaria': item['franja_horaria'],
+            'pedidos_estimados': item['pedidos_estimados'],
+            'nivel_demanda': personal['nivel_demanda'],
+            'personal_cocina': personal['personal_cocina'],
+            'personal_despacho': personal['personal_despacho'],
+            'personal_delivery': personal['personal_delivery'],
+            'recomendacion_texto': personal['recomendacion_texto'],
+            'es_franja_critica': False,
+        })
+
+    if filas:
+        franja_pico = max(filas, key=lambda fila: fila['pedidos_estimados'])
+        franja_pico['es_franja_critica'] = True
+
+    return filas
 
 
 # ------------------------------------------------------------------

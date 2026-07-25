@@ -5,7 +5,9 @@ from django.shortcuts import redirect, render
 
 from .models import PredictionResult
 from .utils import (
+    calcular_planificacion_personal_por_franja,
     generar_prediccion,
+    nombre_dia_semana,
     obtener_ultimo_dataset_valido,
     obtener_ultimo_training_run_entrenado,
 )
@@ -54,6 +56,11 @@ def _procesar_consulta(request):
         messages.error(request, resultado['errores'][0] if resultado['errores'] else 'Ocurrió un error al predecir.')
         return
 
+    personal_operativo_por_franja = calcular_planificacion_personal_por_franja(resultado['resultado_por_franja'])
+    personal_operativo_pico = next(
+        (fila for fila in personal_operativo_por_franja if fila['es_franja_critica']), None
+    )
+
     PredictionResult.objects.create(
         training_run=resultado['training_run'],
         fecha_prediccion=fecha_prediccion,
@@ -69,6 +76,9 @@ def _procesar_consulta(request):
             'graficos': resultado['graficos'],
             'productos_operativos_top3': resultado['productos_operativos_top3'],
             'productos_lideres_texto': resultado['productos_lideres_texto'],
+            'personal_operativo_por_franja': personal_operativo_por_franja,
+            'personal_operativo_pico': personal_operativo_pico,
+            'dia_semana': nombre_dia_semana(fecha_prediccion),
         },
         modelo_demanda_usado=resultado['modelo_demanda_usado'],
         modelo_producto_usado=resultado['modelo_producto_usado'],

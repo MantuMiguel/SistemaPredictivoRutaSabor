@@ -6,228 +6,369 @@
 {% block content %}
 
     <p class="text-gray-500 text-sm mb-6 max-w-2xl mx-auto text-center">
-        Predicción de demanda para apoyar la planificación de cocina y delivery:
-        cuánto se va a pedir, de qué producto y en qué momento del día.
+        Resumen ejecutivo de la operación: cuánto se va a pedir, en qué franja y con qué productos, según el
+        último modelo entrenado.
     </p>
 
-    <!-- Cards de indicadores clave (valores de demostración, todavía no vienen del modelo) -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div class="bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-200 border border-gray-100 p-5 flex items-start justify-between gap-3">
-            <div class="flex flex-col gap-1 min-w-0">
-                <span class="text-xs text-gray-500">Pedidos estimados del día</span>
-                <span class="text-2xl font-bold text-text-dark">185</span>
-                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-600 w-fit">+12% vs. ayer</span>
-            </div>
-            <span class="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center text-red-600 shrink-0">
-                <span class="material-symbols-outlined text-[20px]">shopping_bag</span>
+    {% if not dataset_valido %}
+        <!-- Estado vacío 1: no hay dataset válido -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-10 flex flex-col items-center text-center gap-3">
+            <span class="w-14 h-14 rounded-full bg-red-50 text-red-600 flex items-center justify-center">
+                <span class="material-symbols-outlined text-[28px]">database</span>
             </span>
+            <h3 class="font-bold text-lg text-text-dark">Primero debes cargar y validar un dataset histórico.</h3>
+            <a href="{% url 'datasets:index' %}"
+               class="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium px-5 py-2.5 rounded-xl transition-colors">
+                <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+                Ir a Dataset Histórico
+            </a>
         </div>
 
-        <div class="bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-200 border border-gray-100 p-5 flex items-start justify-between gap-3">
-            <div class="flex flex-col gap-1 min-w-0">
-                <span class="text-xs text-gray-500">Producto con mayor demanda</span>
-                <span class="text-2xl font-bold text-text-dark">Hamburguesa Clásica</span>
-                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-red-100 text-red-600 w-fit">Alta demanda</span>
-            </div>
-            <span class="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center text-red-600 shrink-0">
-                <span class="material-symbols-outlined text-[20px]">lunch_dining</span>
+    {% elif not training_run %}
+        <!-- Estado vacío 2: dataset válido, pero sin modelo entrenado -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-10 flex flex-col items-center text-center gap-3">
+            <span class="w-14 h-14 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center">
+                <span class="material-symbols-outlined text-[28px]">model_training</span>
             </span>
+            <h3 class="font-bold text-lg text-text-dark">El dataset está listo. Entrena un modelo para activar el Panel de Control.</h3>
+            <a href="{% url 'machine_learning:index' %}"
+               class="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium px-5 py-2.5 rounded-xl transition-colors">
+                <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+                Ir a Modelo Predictivo
+            </a>
         </div>
 
-        <div class="bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-200 border border-gray-100 p-5 flex items-start justify-between gap-3">
-            <div class="flex flex-col gap-1 min-w-0">
-                <span class="text-xs text-gray-500">Franja horaria crítica</span>
-                <span class="text-2xl font-bold text-text-dark">19:00 - 21:00</span>
-                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-600 w-fit">Hora pico</span>
-            </div>
-            <span class="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600 shrink-0">
-                <span class="material-symbols-outlined text-[20px]">schedule</span>
-            </span>
-        </div>
+    {% else %}
 
-        <div class="bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-200 border border-gray-100 p-5 flex items-start justify-between gap-3">
-            <div class="flex flex-col gap-1 min-w-0">
-                <span class="text-xs text-gray-500">Promoción con mayor impacto</span>
-                <span class="text-2xl font-bold text-text-dark">Combo Familiar</span>
-                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-600 w-fit">+8% en conversión</span>
+        {% if error_calculo %}
+            <div class="alert-item alert-item--danger mb-10">
+                <span class="material-symbols-outlined text-[18px]">error</span>
+                <span class="alert-item__desc">No se pudo calcular el mapa de calor semanal: {{ error_calculo }}</span>
             </div>
-            <span class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 shrink-0">
-                <span class="material-symbols-outlined text-[20px]">local_offer</span>
-            </span>
-        </div>
-    </div>
+        {% endif %}
 
-    <!-- Predicción de demanda por horas: barras hechas solo con HTML + CSS -->
-    <div class="mt-10">
-        <h2 class="font-bold text-lg text-text-dark mb-1 text-center">Predicción de demanda por horas</h2>
-        <p class="text-xs text-gray-500 mb-4 text-center">Pedidos estimados por franja horaria (datos de demostración).</p>
+        <!-- Cards de indicadores clave (datos reales del sistema) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+            <div class="bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-200 border border-gray-100 p-5 flex items-start justify-between gap-3">
+                <div class="flex flex-col gap-1 min-w-0">
+                    <span class="text-xs text-gray-500">Pedidos estimados de hoy</span>
+                    <span class="text-2xl font-bold text-text-dark">{{ pedidos_estimados_hoy|default:"—" }}</span>
+                </div>
+                <span class="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center text-red-600 shrink-0">
+                    <span class="material-symbols-outlined text-[20px]">shopping_bag</span>
+                </span>
+            </div>
 
-        <!-- AQUÍ LUEGO SE MOSTRARÁ LA PREDICCIÓN REAL DEL MODELO. -->
-        <div class="bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-200 border border-gray-100 p-6">
-            <div class="hour-chart__bars">
-                <div class="hour-bar">
-                    <div class="hour-bar__fill" style="height: 40%;"><span class="hour-bar__value">32</span></div>
-                    <span class="hour-bar__label">12p</span>
+            <div class="bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-200 border border-gray-100 p-5 flex items-start justify-between gap-3">
+                <div class="flex flex-col gap-1 min-w-0">
+                    <span class="text-xs text-gray-500">Franja crítica de hoy</span>
+                    <span class="text-2xl font-bold text-text-dark">{{ franja_critica_hoy|default:"—" }}</span>
                 </div>
-                <div class="hour-bar">
-                    <div class="hour-bar__fill" style="height: 55%;"><span class="hour-bar__value">44</span></div>
-                    <span class="hour-bar__label">1p</span>
-                </div>
-                <div class="hour-bar">
-                    <div class="hour-bar__fill" style="height: 35%;"><span class="hour-bar__value">28</span></div>
-                    <span class="hour-bar__label">2p</span>
-                </div>
-                <div class="hour-bar">
-                    <div class="hour-bar__fill" style="height: 30%;"><span class="hour-bar__value">24</span></div>
-                    <span class="hour-bar__label">3p</span>
-                </div>
-                <div class="hour-bar">
-                    <div class="hour-bar__fill" style="height: 45%;"><span class="hour-bar__value">36</span></div>
-                    <span class="hour-bar__label">4p</span>
-                </div>
-                <div class="hour-bar">
-                    <div class="hour-bar__fill" style="height: 60%;"><span class="hour-bar__value">48</span></div>
-                    <span class="hour-bar__label">5p</span>
-                </div>
-                <div class="hour-bar">
-                    <div class="hour-bar__fill" style="height: 75%;"><span class="hour-bar__value">60</span></div>
-                    <span class="hour-bar__label">6p</span>
-                </div>
-                <div class="hour-bar hour-bar--critica">
-                    <div class="hour-bar__fill" style="height: 95%;"><span class="hour-bar__value">76</span></div>
-                    <span class="hour-bar__label">7p</span>
-                </div>
-                <div class="hour-bar hour-bar--critica">
-                    <div class="hour-bar__fill" style="height: 100%;"><span class="hour-bar__value">80</span></div>
-                    <span class="hour-bar__label">8p</span>
-                </div>
+                <span class="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600 shrink-0">
+                    <span class="material-symbols-outlined text-[20px]">schedule</span>
+                </span>
             </div>
-            <div class="flex gap-5 mt-4 text-xs text-gray-500 justify-center">
-                <span class="inline-flex items-center gap-1.5"><span class="legend-dot legend-dot--normal"></span>Demanda normal</span>
-                <span class="inline-flex items-center gap-1.5"><span class="legend-dot legend-dot--critica"></span>Hora crítica</span>
-            </div>
-        </div>
-    </div>
 
-    <!-- Productos con mayor demanda -->
-    <div class="mt-10">
-        <h2 class="font-bold text-lg text-text-dark mb-1 text-center">Productos con mayor demanda</h2>
-        <p class="text-xs text-gray-500 mb-4 text-center">Unidades estimadas para hoy (datos de demostración).</p>
+            <div class="bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-200 border border-gray-100 p-5 flex items-start justify-between gap-3">
+                <div class="flex flex-col gap-1 min-w-0">
+                    <span class="text-xs text-gray-500">Productos líderes</span>
+                    <span class="text-lg font-bold text-text-dark leading-tight">{{ productos_lideres_texto|default:"Sin predicción reciente" }}</span>
+                </div>
+                <span class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 shrink-0">
+                    <span class="material-symbols-outlined text-[20px]">lunch_dining</span>
+                </span>
+            </div>
 
-        <!-- AQUÍ LUEGO IRÁN LOS PRODUCTOS CALCULADOS DESDE EL DATASET. -->
-        <div class="bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-200 border border-gray-100 px-6 py-2">
-            <div class="product-row">
-                <div class="product-row__info">
-                    <span class="product-row__icon"><span class="material-symbols-outlined text-[18px]">lunch_dining</span></span>
-                    <span class="product-row__name">Hamburguesa Clásica</span>
+            <div class="bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-200 border border-gray-100 p-5 flex items-start justify-between gap-3">
+                <div class="flex flex-col gap-1 min-w-0">
+                    <span class="text-xs text-gray-500">Estado del modelo</span>
+                    <span class="text-lg font-bold text-text-dark leading-tight">{{ training_run.modelo_seleccionado_demanda }}</span>
+                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-600 w-fit">RMSE {{ training_run.rmse_demanda }} &middot; R&sup2; {{ training_run.r2_demanda }}</span>
                 </div>
-                <div class="product-row__bar"><div class="product-row__bar-fill" style="width: 81%;"></div></div>
-                <span class="product-row__value">62 uds.</span>
-            </div>
-            <div class="product-row">
-                <div class="product-row__info">
-                    <span class="product-row__icon"><span class="material-symbols-outlined text-[18px]">local_pizza</span></span>
-                    <span class="product-row__name">Pizza Personal</span>
-                </div>
-                <div class="product-row__bar"><div class="product-row__bar-fill" style="width: 62%;"></div></div>
-                <span class="product-row__value">48 uds.</span>
-            </div>
-            <div class="product-row">
-                <div class="product-row__info">
-                    <span class="product-row__icon"><span class="material-symbols-outlined text-[18px]">tapas</span></span>
-                    <span class="product-row__name">Salchipapa</span>
-                </div>
-                <div class="product-row__bar"><div class="product-row__bar-fill" style="width: 53%;"></div></div>
-                <span class="product-row__value">41 uds.</span>
-            </div>
-            <div class="product-row">
-                <div class="product-row__info">
-                    <span class="product-row__icon"><span class="material-symbols-outlined text-[18px]">set_meal</span></span>
-                    <span class="product-row__name">Combo Familiar</span>
-                </div>
-                <div class="product-row__bar"><div class="product-row__bar-fill" style="width: 45%;"></div></div>
-                <span class="product-row__value">35 uds.</span>
-            </div>
-            <div class="product-row">
-                <div class="product-row__info">
-                    <span class="product-row__icon"><span class="material-symbols-outlined text-[18px]">local_drink</span></span>
-                    <span class="product-row__name">Bebidas</span>
-                </div>
-                <div class="product-row__bar"><div class="product-row__bar-fill" style="width: 100%;"></div></div>
-                <span class="product-row__value">77 uds.</span>
-            </div>
-        </div>
-    </div>
-
-    <!-- Alertas y recomendaciones para la planificación de cocina -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-10">
-        <div class="bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-200 border border-gray-100 p-5">
-            <h3 class="font-semibold text-text-dark mb-3 text-sm">Alertas operativas</h3>
-
-            <div class="alert-item alert-item--danger">
-                <span class="material-symbols-outlined text-[18px]">trending_up</span>
-                <span class="alert-item__desc">Pico de demanda previsto entre 7 p.m. y 9 p.m.</span>
-            </div>
-            <div class="alert-item alert-item--warning">
-                <span class="material-symbols-outlined text-[18px]">warning</span>
-                <span class="alert-item__desc">Stock bajo de papas fritas.</span>
-            </div>
-            <div class="alert-item alert-item--info">
-                <span class="material-symbols-outlined text-[18px]">restaurant</span>
-                <span class="alert-item__desc">Reforzar preparación de hamburguesas y combos.</span>
-            </div>
-            <div class="alert-item alert-item--info">
-                <span class="material-symbols-outlined text-[18px]">local_shipping</span>
-                <span class="alert-item__desc">Coordinar delivery antes de la hora pico.</span>
+                <span class="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center text-green-600 shrink-0">
+                    <span class="material-symbols-outlined text-[20px]">check_circle</span>
+                </span>
             </div>
         </div>
 
-        <div class="bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-200 border border-gray-100 p-5">
-            <h3 class="font-semibold text-text-dark mb-3 text-sm">Recomendaciones para cocina</h3>
-            <ul class="recommend-list">
-                <li><span class="recommend-list__icon"><span class="material-symbols-outlined text-[16px]">schedule</span></span>Preparar insumos antes de la franja crítica.</li>
-                <li><span class="recommend-list__icon"><span class="material-symbols-outlined text-[16px]">star</span></span>Priorizar productos con mayor demanda estimada.</li>
-                <li><span class="recommend-list__icon"><span class="material-symbols-outlined text-[16px]">category</span></span>Organizar cocina por categorías.</li>
-                <li><span class="recommend-list__icon"><span class="material-symbols-outlined text-[16px]">local_shipping</span></span>Anticipar empaques y coordinación de delivery.</li>
-            </ul>
-        </div>
-    </div>
+        {% if mapa_calor %}
+        <!-- Mapa de calor semanal de demanda -->
+        <div class="mb-10">
+            <h2 class="font-bold text-lg text-text-dark mb-1 text-center">Mapa de calor semanal de demanda</h2>
+            <p class="text-xs text-gray-500 mb-4 text-center">
+                Semana del {{ lunes_semana|date:"d/m/Y" }} al {{ domingo_semana|date:"d/m/Y" }} &middot;
+                calculado con el modelo de demanda total ya entrenado ({{ training_run.modelo_seleccionado_demanda }}).
+            </p>
 
-    <!-- Problemas operativos que el sistema busca reducir -->
-    <div class="mt-10">
-        <h2 class="font-bold text-lg text-text-dark mb-4 text-center">Problemas que resuelve</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div class="bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-200 border border-gray-100 p-5">
-                <span class="material-symbols-outlined text-red-600 mb-2 block">hourglass_top</span>
-                <h4 class="font-semibold text-text-dark text-sm mb-1">Retrasos operativos</h4>
-                <p class="text-xs text-gray-500">Acumulación de pedidos en horas de alta demanda.</p>
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 md:p-6">
+                <div class="overflow-x-auto">
+                    <table class="w-full border-collapse min-w-[560px]">
+                        <thead>
+                            <tr>
+                                <th class="text-left text-xs font-semibold uppercase tracking-wider text-gray-500 p-2">Día</th>
+                                <th class="text-center text-xs font-semibold uppercase tracking-wider text-gray-500 p-2">Desayuno</th>
+                                <th class="text-center text-xs font-semibold uppercase tracking-wider text-gray-500 p-2">Almuerzo</th>
+                                <th class="text-center text-xs font-semibold uppercase tracking-wider text-gray-500 p-2">Cena</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for fila in mapa_calor %}
+                                <tr class="{% if fila.es_hoy %}bg-red-50/40{% endif %}">
+                                    <td class="p-2 align-middle whitespace-nowrap">
+                                        <div class="flex items-center gap-1.5 text-sm {% if fila.es_hoy %}text-red-600 font-bold{% else %}text-text-dark font-semibold{% endif %}">
+                                            {% if fila.es_hoy %}<span class="w-1.5 h-1.5 rounded-full bg-red-600"></span>{% endif %}
+                                            {{ fila.dia }}
+                                        </div>
+                                        <div class="text-[11px] text-gray-400">{{ fila.fecha|date:"d/m" }}</div>
+                                    </td>
+                                    {% for franja_nombre, celda in fila.celdas.items %}
+                                        <td class="p-1.5">
+                                            <div class="rounded-xl px-2 py-2 text-center
+                                                {% if celda.nivel_demanda == 'Demanda crítica' %}bg-red-50
+                                                {% elif celda.nivel_demanda == 'Alta demanda' %}bg-orange-50
+                                                {% elif celda.nivel_demanda == 'Demanda moderada' %}bg-amber-50
+                                                {% else %}bg-green-50{% endif %}">
+                                                <div class="text-base font-bold
+                                                    {% if celda.nivel_demanda == 'Demanda crítica' %}text-red-700
+                                                    {% elif celda.nivel_demanda == 'Alta demanda' %}text-orange-700
+                                                    {% elif celda.nivel_demanda == 'Demanda moderada' %}text-amber-700
+                                                    {% else %}text-green-700{% endif %}">
+                                                    {{ celda.pedidos_estimados }}
+                                                </div>
+                                                <div class="text-[10px] text-gray-500 leading-tight">{{ celda.nivel_demanda }}</div>
+                                            </div>
+                                        </td>
+                                    {% endfor %}
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Leyenda de colores -->
+                <div class="flex flex-wrap gap-4 mt-4 justify-center text-xs text-gray-500">
+                    <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-green-200"></span>Baja demanda (0-79)</span>
+                    <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-amber-200"></span>Demanda moderada (80-119)</span>
+                    <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-orange-300"></span>Alta demanda (120-179)</span>
+                    <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-red-300"></span>Demanda crítica (180+)</span>
+                </div>
             </div>
-            <div class="bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-200 border border-gray-100 p-5">
-                <span class="material-symbols-outlined text-amber-600 mb-2 block">device_hub</span>
-                <h4 class="font-semibold text-text-dark text-sm mb-1">Falta de coordinación</h4>
-                <p class="text-xs text-gray-500">Entre las áreas de pedidos, cocina y delivery.</p>
-            </div>
-            <div class="bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-200 border border-gray-100 p-5">
-                <span class="material-symbols-outlined text-blue-600 mb-2 block">local_shipping</span>
-                <h4 class="font-semibold text-text-dark text-sm mb-1">Tiempos de entrega</h4>
-                <p class="text-xs text-gray-500">Incumplimiento de los tiempos prometidos.</p>
-            </div>
-            <div class="bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-200 border border-gray-100 p-5">
-                <span class="material-symbols-outlined text-gray-500 mb-2 block">psychology</span>
-                <h4 class="font-semibold text-text-dark text-sm mb-1">Dependencia manual</h4>
-                <p class="text-xs text-gray-500">Decisiones basadas solo en experiencia, sin datos.</p>
+
+            <!--
+                MEJORA FUTURA: este mapa de calor es semanal (semana actual). Cuando el
+                módulo Predicciones permita consultar un rango de "próximos 7 días", tendría
+                sentido reemplazar/complementar esta vista con un mapa de calor semanal basado
+                en esa consulta real en vez de valores por defecto (clima Soleado, sin promoción).
+            -->
+        </div>
+        {% endif %}
+
+        <!-- Planificación de Personal Operativo -->
+        <div class="mb-10">
+            <h2 class="font-bold text-lg text-text-dark mb-1 text-center">Planificación de Personal Operativo</h2>
+            <p class="text-xs text-gray-500 mb-4 text-center">
+                Personal recomendado según la demanda estimada por franja horaria.
+            </p>
+
+            {% if planificacion_personal_franjas %}
+                <!-- Card resumen: franja crítica -->
+                {% if personal_operativo_pico %}
+                <div class="relative bg-white rounded-2xl shadow-sm border-2 border-orange-300 p-5 md:p-6 mb-4 overflow-hidden">
+                    <div class="absolute inset-y-0 left-0 w-1.5 bg-gradient-to-b from-orange-400 to-red-500"></div>
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+                        <div class="flex items-center gap-2">
+                            <span class="w-9 h-9 rounded-xl bg-orange-50 text-orange-600 flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined text-[20px]">local_fire_department</span>
+                            </span>
+                            <span class="font-bold text-text-dark">Franja crítica: {{ personal_operativo_pico.franja_horaria }}</span>
+                        </div>
+                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-600">
+                            <span class="material-symbols-outlined text-[14px]">priority_high</span> Crítica
+                        </span>
+                    </div>
+                    <div class="grid grid-cols-2 lg:grid-cols-5 gap-4">
+                        <div class="flex flex-col gap-1">
+                            <span class="text-xs text-gray-500">Pedidos estimados</span>
+                            <span class="text-2xl font-bold text-text-dark">{{ personal_operativo_pico.pedidos_estimados }}</span>
+                        </div>
+                        <div class="flex flex-col gap-1">
+                            <span class="text-xs text-gray-500">Nivel de demanda</span>
+                            <span class="text-lg font-bold text-text-dark leading-tight">{{ personal_operativo_pico.nivel_demanda }}</span>
+                        </div>
+                        <div class="flex flex-col gap-1">
+                            <span class="text-xs text-gray-500 flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">skillet</span>Cocina</span>
+                            <span class="text-2xl font-bold text-text-dark">{{ personal_operativo_pico.personal_cocina }}</span>
+                        </div>
+                        <div class="flex flex-col gap-1">
+                            <span class="text-xs text-gray-500 flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">inventory_2</span>Despacho/empaque</span>
+                            <span class="text-2xl font-bold text-text-dark">{{ personal_operativo_pico.personal_despacho }}</span>
+                        </div>
+                        <div class="flex flex-col gap-1">
+                            <span class="text-xs text-gray-500 flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">local_shipping</span>Delivery/coordinación</span>
+                            <span class="text-2xl font-bold text-text-dark">{{ personal_operativo_pico.personal_delivery }}</span>
+                        </div>
+                    </div>
+                    <div class="alert-item alert-item--info mt-4">
+                        <span class="material-symbols-outlined text-[18px]">groups</span>
+                        <span class="alert-item__desc">{{ personal_operativo_pico.recomendacion_texto }}</span>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Timeline por franja -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {% for franja in planificacion_personal_franjas %}
+                        <div class="bg-white rounded-2xl shadow-sm border p-5
+                            {% if franja.es_franja_critica %}border-orange-300{% else %}border-gray-100{% endif %}">
+                            <div class="flex items-center justify-between mb-3">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-9 h-9 rounded-xl bg-red-50 flex items-center justify-center text-red-600 shrink-0">
+                                        <span class="material-symbols-outlined text-[18px]">
+                                            {% if franja.franja_horaria == 'Desayuno' %}wb_twilight{% elif franja.franja_horaria == 'Almuerzo' %}lunch_dining{% else %}bedtime{% endif %}
+                                        </span>
+                                    </span>
+                                    <span class="font-bold text-text-dark">{{ franja.franja_horaria }}</span>
+                                </div>
+                                {% if franja.es_franja_critica %}
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-red-100 text-red-600">Crítica</span>
+                                {% endif %}
+                            </div>
+                            <div class="flex items-center justify-between mb-4">
+                                <div>
+                                    <span class="block text-[11px] text-gray-500">Pedidos estimados</span>
+                                    <span class="block text-lg font-bold text-text-dark">{{ franja.pedidos_estimados }}</span>
+                                </div>
+                                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium
+                                    {% if franja.nivel_demanda == 'Demanda crítica' %}bg-red-100 text-red-600
+                                    {% elif franja.nivel_demanda == 'Demanda alta' %}bg-orange-100 text-orange-600
+                                    {% elif franja.nivel_demanda == 'Demanda media' %}bg-amber-100 text-amber-600
+                                    {% else %}bg-green-100 text-green-600{% endif %}">
+                                    {{ franja.nivel_demanda }}
+                                </span>
+                            </div>
+                            <div class="grid grid-cols-3 gap-2 text-center border-t border-gray-100 pt-3">
+                                <div class="flex flex-col items-center gap-0.5">
+                                    <span class="material-symbols-outlined text-[16px] text-gray-400">skillet</span>
+                                    <span class="text-base font-bold text-text-dark">{{ franja.personal_cocina }}</span>
+                                    <span class="text-[10px] text-gray-500">Cocina</span>
+                                </div>
+                                <div class="flex flex-col items-center gap-0.5">
+                                    <span class="material-symbols-outlined text-[16px] text-gray-400">inventory_2</span>
+                                    <span class="text-base font-bold text-text-dark">{{ franja.personal_despacho }}</span>
+                                    <span class="text-[10px] text-gray-500">Despacho</span>
+                                </div>
+                                <div class="flex flex-col items-center gap-0.5">
+                                    <span class="material-symbols-outlined text-[16px] text-gray-400">local_shipping</span>
+                                    <span class="text-base font-bold text-text-dark">{{ franja.personal_delivery }}</span>
+                                    <span class="text-[10px] text-gray-500">Delivery</span>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 text-center text-sm text-gray-500">
+                    La planificación de personal se generará cuando exista una predicción válida por franja horaria.
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Recomendaciones rápidas -->
+        <div class="mb-10">
+            <h2 class="font-bold text-lg text-text-dark mb-3 text-center">Recomendaciones rápidas</h2>
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+                {% if prediccion %}
+                    <ul class="recommend-list">
+                        {% for item in recomendaciones_rapidas %}
+                            <li><span class="recommend-list__icon"><span class="material-symbols-outlined text-[16px]">lightbulb</span></span>{{ item.texto }}</li>
+                        {% endfor %}
+                    </ul>
+                    <div class="text-right mt-3">
+                        <a href="{% url 'predicciones:index' %}" class="text-xs font-medium text-red-600 hover:text-red-700 underline">Ver todas las recomendaciones &rarr;</a>
+                    </div>
+                {% else %}
+                    <p class="text-sm text-gray-500 text-center mb-4">Genera una predicción para obtener recomendaciones operativas.</p>
+                    <div class="text-center">
+                        <a href="{% url 'predicciones:index' %}"
+                           class="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium px-5 py-2.5 rounded-xl transition-colors">
+                            <span class="material-symbols-outlined text-[18px]">auto_awesome</span>
+                            Ir a Predicciones
+                        </a>
+                    </div>
+                {% endif %}
             </div>
         </div>
-    </div>
 
-    <!-- Accesos directos a los demás módulos -->
-    <div class="mt-10 flex flex-wrap gap-3">
-        <a href="{% url 'datasets:index' %}"
-           class="bg-white hover:bg-red-50 text-red-600 border border-red-200 font-medium px-4 py-2 rounded-xl transition-colors focus:outline-none focus:ring-2 focus:ring-red-200">Ver Dataset</a>
-        <a href="{% url 'machine_learning:index' %}"
-           class="bg-white hover:bg-red-50 text-red-600 border border-red-200 font-medium px-4 py-2 rounded-xl transition-colors focus:outline-none focus:ring-2 focus:ring-red-200">Ver Modelo Predictivo</a>
-        <a href="{% url 'predicciones:index' %}"
-           class="bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-medium px-4 py-2 rounded-xl transition-colors focus:outline-none focus:ring-2 focus:ring-red-300">Ir a Predicciones</a>
-    </div>
+        <!-- Estado del sistema -->
+        <div class="mb-10">
+            <h2 class="font-bold text-lg text-text-dark mb-3 text-center">Estado del sistema</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 flex items-center gap-3">
+                    <span class="w-10 h-10 rounded-xl bg-green-50 text-green-600 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-[20px]">database</span>
+                    </span>
+                    <div>
+                        <span class="block text-xs text-gray-500">Dataset</span>
+                        <span class="block text-sm font-semibold text-text-dark">Validado</span>
+                    </div>
+                </div>
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 flex items-center gap-3">
+                    <span class="w-10 h-10 rounded-xl bg-green-50 text-green-600 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-[20px]">model_training</span>
+                    </span>
+                    <div>
+                        <span class="block text-xs text-gray-500">Modelo</span>
+                        <span class="block text-sm font-semibold text-text-dark">Entrenado</span>
+                    </div>
+                </div>
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 flex items-center gap-3">
+                    <span class="w-10 h-10 rounded-xl {% if prediccion %}bg-green-50 text-green-600{% else %}bg-gray-100 text-gray-400{% endif %} flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-[20px]">auto_awesome</span>
+                    </span>
+                    <div>
+                        <span class="block text-xs text-gray-500">Última predicción</span>
+                        <span class="block text-sm font-semibold text-text-dark">{% if prediccion %}Generada{% else %}Pendiente{% endif %}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top productos recientes -->
+        {% if top_productos %}
+        <div class="mb-10">
+            <h2 class="font-bold text-lg text-text-dark mb-1 text-center">Top productos recientes</h2>
+            <p class="text-xs text-gray-500 mb-4 text-center">
+                {% if top_productos_es_historico %}
+                    Todavía no hay una predicción reciente: se muestra el histórico completo del dataset.
+                {% else %}
+                    Basado en la última predicción generada en Predicciones.
+                {% endif %}
+            </p>
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 px-6 py-2">
+                {% for item in top_productos %}
+                    <div class="product-row">
+                        <div class="product-row__info">
+                            <span class="product-row__icon"><span class="material-symbols-outlined text-[18px]">lunch_dining</span></span>
+                            <span class="product-row__name">{{ item.producto }}</span>
+                        </div>
+                        <div class="product-row__bar"><div class="product-row__bar-fill" style="width: {% widthratio item.cantidad_estimada top_productos.0.cantidad_estimada 100 %}%;"></div></div>
+                        <span class="product-row__value">{{ item.cantidad_estimada|floatformat:0 }} uds.</span>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Accesos directos a los demás módulos -->
+        <div class="flex flex-wrap gap-3">
+            <a href="{% url 'datasets:index' %}"
+               class="bg-white hover:bg-red-50 text-red-600 border border-red-200 font-medium px-4 py-2 rounded-xl transition-colors focus:outline-none focus:ring-2 focus:ring-red-200">Ver Dataset</a>
+            <a href="{% url 'machine_learning:index' %}"
+               class="bg-white hover:bg-red-50 text-red-600 border border-red-200 font-medium px-4 py-2 rounded-xl transition-colors focus:outline-none focus:ring-2 focus:ring-red-200">Ver Modelo Predictivo</a>
+            <a href="{% url 'predicciones:index' %}"
+               class="bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-medium px-4 py-2 rounded-xl transition-colors focus:outline-none focus:ring-2 focus:ring-red-300">Ir a Predicciones</a>
+        </div>
+
+    {% endif %}
 
 {% endblock %}
